@@ -18,6 +18,7 @@ public class ResultFragment extends Fragment {
         Bundle args = new Bundle();
         ResultFragment fragment = new ResultFragment();
         fragment.setArguments(args);
+
         return fragment;
     }
 
