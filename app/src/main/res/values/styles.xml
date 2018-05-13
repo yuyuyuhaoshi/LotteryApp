@@ -20,7 +20,7 @@
         <item name="android:colorPrimary">@color/colorPrimary</item>
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">#212121</item>
+        <item name="android:statusBarColor">@color/bg2</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowTranslucentNavigation">false</item>
     </style>

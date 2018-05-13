@@ -2,24 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#212121">
+    android:background="@color/bg2">
 
     <Button
-        android:id="@+id/lottery_select_btn"
+        android:id="@+id/trend_lottery_select_btn"
         android:layout_width="85dp"
         android:layout_height="30dp"
         android:layout_centerVertical="true"
+        android:background="@drawable/shape_button"
         android:text="@string/lottery_beijing"
-        android:textColor="@android:color/white"
-        android:background="@drawable/shape_button" />
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/actionbar_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:text="走势"
         android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:layout_centerInParent="true"/>
+        android:textSize="18sp" />
 
 </RelativeLayout>
