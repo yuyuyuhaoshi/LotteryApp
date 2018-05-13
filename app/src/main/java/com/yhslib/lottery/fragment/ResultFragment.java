@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,8 +49,8 @@ public class ResultFragment extends Fragment {
     }
 
     private void init() {
-        String[] from = {"title"};
-        int[] to = {R.id.test};
+        String[] from = {"icon", "title", "period", "time", "result", "sum", "size", "singleOrDouble"};
+        int[] to = {R.id.icon, R.id.title, R.id.period, R.id.time, R.id.result, R.id.sum, R.id.size, R.id.singleOrDouble};
         adapter = new SimpleAdapter(getActivity(), getData(), R.layout.list_lottery_result, from, to);
         listView.setAdapter(adapter);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -73,7 +72,7 @@ public class ResultFragment extends Fragment {
                     break;
 
             }
-        };
+        }
     };
 
     private void findView() {
@@ -84,52 +83,64 @@ public class ResultFragment extends Fragment {
     public static ArrayList<Map<String, Object>> getData() {
         ArrayList<Map<String, Object>> data = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
-        map.put("title", "Result1");
+        map.put("icon", R.mipmap.pkten);
+        map.put("title", "北京PK拾");
+        map.put("period", "第" + "681585" + "期");
+        map.put("time", "22:20:41");
+        map.put("result", "1 2 3 4 5 6 7 8 9 10");
+        map.put("sum", "20");
+        map.put("size", "大");
+        map.put("singleOrDouble", "单");
         data.add(map);
         map = new HashMap<>();
-        map.put("title", "Result2");
+        map.put("icon", R.mipmap.pkten);
+        map.put("title", "北京PK拾");
+        map.put("period", "第" + "681585" + "期");
+        map.put("time", "22:20:41");
+        map.put("result", "1 2 3 4 5 6 7 8 9 10");
+        map.put("sum", "20");
+        map.put("size", "大");
+        map.put("singleOrDouble", "单");
         data.add(map);
         map = new HashMap<>();
-        map.put("title", "Result3");
+        map.put("icon", R.mipmap.pkten);
+        map.put("title", "北京PK拾");
+        map.put("period", "第" + "681585" + "期");
+        map.put("time", "22:20:41");
+        map.put("result", "1 2 3 4 5 6 7 8 9 10");
+        map.put("sum", "20");
+        map.put("size", "大");
+        map.put("singleOrDouble", "单");
         data.add(map);
         map = new HashMap<>();
-        map.put("title", "Result3");
+        map.put("icon", R.mipmap.shishicai);
+        map.put("title", "重庆时时彩");
+        map.put("period", "第" + "681585" + "期");
+        map.put("time", "22:20:41");
+        map.put("result", "1 2 3 4 5");
+        map.put("sum", "20");
+        map.put("size", "大");
+        map.put("singleOrDouble", "单");
         data.add(map);
         map = new HashMap<>();
-        map.put("title", "Result3");
+        map.put("icon", R.mipmap.pkten);
+        map.put("title", "北京PK拾");
+        map.put("period", "第" + "681585" + "期");
+        map.put("time", "22:20:41");
+        map.put("result", "1 2 3 4 5 6 7 8 9 10");
+        map.put("sum", "20");
+        map.put("size", "大");
+        map.put("singleOrDouble", "单");
         data.add(map);
         map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
-        data.add(map);
-        map = new HashMap<>();
-        map.put("title", "Result3");
+        map.put("icon", R.mipmap.pkten);
+        map.put("title", "北京PK拾");
+        map.put("period", "第" + "681585" + "期");
+        map.put("time", "22:20:41");
+        map.put("result", "1 2 3 4 5 6 7 8 9 10");
+        map.put("sum", "20");
+        map.put("size", "大");
+        map.put("singleOrDouble", "单");
         data.add(map);
         return data;
     }

@@ -219,6 +219,7 @@ public class TrendFragment extends Fragment {
     }
 
     private void init() {
+        tabLayout.addTab(tabLayout.newTab().setText("号码"));
         tabLayout.addTab(tabLayout.newTab().setText("大小"));
         tabLayout.addTab(tabLayout.newTab().setText("单双"));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -226,10 +227,13 @@ public class TrendFragment extends Fragment {
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
                     case 0:
+                        Toast.makeText(getActivity(), "点击了号码", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 1:
                         Toast.makeText(getActivity(), "点击了大小", Toast.LENGTH_SHORT).show();
                         break;
 
-                    case 1:
+                    case 2:
                         Toast.makeText(getActivity(), "点击了单双", Toast.LENGTH_SHORT).show();
                         break;
                 }

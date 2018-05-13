@@ -6,4 +6,6 @@
     <color name="color_trend_bg">#e1f1f1</color>
     <color name="color_trend_text1">#7c8ce9</color>
     <color name="color_trend_text2">#e9925a</color>
+    <color name="bg1">#FF4081</color>
+    <color name="bg2">#212121</color>
 </resources>

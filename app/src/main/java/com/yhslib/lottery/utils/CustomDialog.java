@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class CustomDialog extends Dialog{
+public class CustomDialog extends Dialog {
     private Context context;
     private int height, width;
     private boolean cancelTouchout;
@@ -108,7 +108,7 @@ public class CustomDialog extends Dialog{
             return this;
         }
 
-        public Builder addViewOnclick(int viewRes,View.OnClickListener listener){
+        public Builder addViewOnclick(int viewRes, View.OnClickListener listener) {
             view.findViewById(viewRes).setOnClickListener(listener);
             return this;
         }
