@@ -200,7 +200,7 @@ public class ResultFragment extends Fragment {
         int countDownSecond;
 
         if ((hour >= 0 && hour < 3) || (hour >= 22 && hour < 24)) {
-            // 0-3点 五分钟一期
+            // 0-3点 22-24点 五分钟一期
             targetMinute = ((minute) / 5) * 5 + 5 - 1;
             targetSecond = 59;
 
