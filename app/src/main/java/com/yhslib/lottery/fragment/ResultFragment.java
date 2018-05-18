@@ -293,7 +293,7 @@ public class ResultFragment extends Fragment {
             }
         });
 
-        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        RequestQueue queue = MyApplication.getRequestQueue();
         queue.add(stringRequest);
     }
 
