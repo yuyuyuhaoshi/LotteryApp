@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +18,29 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.yhslib.lottery.Application.MyApplication;
 import com.yhslib.lottery.R;
+import com.yhslib.lottery.config.Url;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.Inflater;
 
 
 public class TrendFragment extends Fragment {
+    private String TAG = "TrendFragment";
+    private String data;
 
     private View view;
     private TabLayout tabLayout;
@@ -55,6 +70,14 @@ public class TrendFragment extends Fragment {
         findView();
         init();
         setData();
+//        fetchPkTenData();
+    }
+
+    private void findView() {
+        swipeRefreshLayout = view.findViewById(R.id.swipe);
+        tabLayout = view.findViewById(R.id.tabLayout);
+        listView = view.findViewById(R.id.listView);
+        header_view = view.findViewById(R.id.view);
     }
 
     private void setData() {
@@ -269,15 +292,53 @@ public class TrendFragment extends Fragment {
 
             }
         }
-
-        ;
     };
 
-    private void findView() {
-        swipeRefreshLayout = view.findViewById(R.id.swipe);
-        tabLayout = view.findViewById(R.id.tabLayout);
-        listView = view.findViewById(R.id.listView);
-        header_view = view.findViewById(R.id.view);
+    private void fetchPkTenData() {
+        String url = Url.PkTenList;
+        final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, response);
+                data = response;
+                Log.d(TAG, parseJsonArray(data).toString());
+                ArrayList<HashMap<String, Object>> hm = parseJsonArray(response);
+                String[] from = {"period", "data1", "data2", "data3", "data4", "data5", "data6", "data7", "data8", "data9", "data10"};
+                int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5, R.id.data6, R.id.data7, R.id.data8, R.id.data9, R.id.data10};
+
+                adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_pkten, from, to);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        RequestQueue queue = MyApplication.getRequestQueue();
+        queue.add(stringRequest);
     }
 
+    private ArrayList<HashMap<String, Object>> parseJsonArray(String responseStr) {
+        ArrayList<HashMap<String, Object>> resultList = new ArrayList<>();
+        try {
+            JSONObject jsonObject = new JSONObject(responseStr);
+            JSONArray resultsArray = jsonObject.getJSONArray("results");
+            for (int i = 0; i < resultsArray.length(); i++) {
+                JSONObject userObject = (JSONObject) resultsArray.opt(i);
+                HashMap<String, Object> hashMap = new HashMap<>();
+                hashMap.put("period", userObject.getInt("period"));
+
+                hashMap.put("result", userObject.getString("result"));
+                String s = userObject.getString("result");
+                String[] resultArray = s.split(" ");
+
+                for (int j=0; j<resultArray.length; j++){
+                    hashMap.put("data" + j, resultArray[j]);
+                }
+                resultList.add(hashMap);
+            }
+        } catch (JSONException e) {
+        }
+        return resultList;
+    }
 }
