@@ -19,6 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.yhslib.lottery.Application.MyApplication;
 import com.yhslib.lottery.R;
 import com.yhslib.lottery.config.Url;
 
@@ -342,7 +343,7 @@ public class ResultFragment extends Fragment {
                 }
             }
         });
-        RequestQueue queue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        RequestQueue queue = MyApplication.getRequestQueue();
         queue.add(stringRequest);
     }
 
