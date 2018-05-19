@@ -19,7 +19,6 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.StringRequest;
 import com.yhslib.lottery.R;
 import com.yhslib.lottery.sqlittle.DiaryDAO;
 import com.yhslib.lottery.utils.Rule;
@@ -27,7 +26,7 @@ import com.yhslib.lottery.utils.Rule;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SimpleTimeZone;
+
 
 
 public class RecordFragment extends Fragment {

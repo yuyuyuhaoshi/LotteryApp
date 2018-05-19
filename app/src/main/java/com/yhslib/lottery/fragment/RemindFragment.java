@@ -1,14 +1,12 @@
 package com.yhslib.lottery.fragment;
 
-import android.annotation.SuppressLint;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -35,8 +33,6 @@ import android.widget.Toast;
 
 import com.yhslib.lottery.R;
 import com.yhslib.lottery.activity.MainActivity;
-import com.yhslib.lottery.service.AlramService;
-import com.yhslib.lottery.sqlittle.DatabaseHelper;
 import com.yhslib.lottery.sqlittle.DiaryDAO;
 import com.yhslib.lottery.sqlittle.NotesLoader;
 import com.yhslib.lottery.utils.CustomDialog;
@@ -45,9 +41,6 @@ import com.yhslib.lottery.utils.Rule;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
-
 
 public class RemindFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -58,7 +51,7 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
     private CustomDialog dialog;
     public DiaryDAO diary;
     private SimpleCursorAdapter simpleCursorAdapter;
-    private boolean isThisFragment=false;
+    private boolean isThisFragment = false;
     int countPkten = 999;
     int countShishicai = 999;
 
@@ -108,7 +101,7 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
         listView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-                isThisFragment=true;
+                isThisFragment = true;
                 MenuInflater menuInflater = getActivity().getMenuInflater();
                 menuInflater.inflate(R.menu.menu_list, menu);
             }
@@ -127,12 +120,12 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onClick(View view) {
                 EditText editTextCount;
-                RadioButton radioPkten,radioOn,radioTypeBigSmall;
-                radioPkten=dialog.findViewById(R.id.radio_pkten);
-                radioOn=dialog.findViewById(R.id.radio_on);
-                radioTypeBigSmall=dialog.findViewById(R.id.radio_big_small);
-                editTextCount=dialog.findViewById(R.id.edit_count);
-                String name,type;
+                RadioButton radioPkten, radioOn, radioTypeBigSmall;
+                radioPkten = dialog.findViewById(R.id.radio_pkten);
+                radioOn = dialog.findViewById(R.id.radio_on);
+                radioTypeBigSmall = dialog.findViewById(R.id.radio_big_small);
+                editTextCount = dialog.findViewById(R.id.edit_count);
+                String name, type;
                 boolean state;
                 int count;
                 switch (view.getId()) {
@@ -152,13 +145,13 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
                             state = false;
                         }
 
-                        if (radioTypeBigSmall.isChecked()){
-                            type=Rule.REMIND_TYPE_BIGSMALL;
-                        }else {
-                            type=Rule.REMIND_TYPE_SINGLEPAIR;
+                        if (radioTypeBigSmall.isChecked()) {
+                            type = Rule.REMIND_TYPE_BIGSMALL;
+                        } else {
+                            type = Rule.REMIND_TYPE_SINGLEPAIR;
                         }
                         count = Integer.parseInt(editTextCount.getText().toString());
-                        diary.updateRemind(String.valueOf(finalId), name, state, count,type);
+                        diary.updateRemind(String.valueOf(finalId), name, state, count, type);
                         init();
                         dialog.dismiss();
                         break;
@@ -182,16 +175,16 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
         String name = cursor.getString(cursor.getColumnIndex(Rule.REMIND_NAME));
         boolean state = cursor.getInt(cursor.getColumnIndex(Rule.REMIND_STATE)) > 0;
         int count = cursor.getInt(cursor.getColumnIndex(Rule.REMIND_COUNT));
-        String type=cursor.getString(cursor.getColumnIndex(Rule.REMIND_TYPE));
-        RadioButton radioShishicai, radioPkten, radioOn, radioOff,radioBigSmall,radioSinglePair;
+        String type = cursor.getString(cursor.getColumnIndex(Rule.REMIND_TYPE));
+        RadioButton radioShishicai, radioPkten, radioOn, radioOff, radioBigSmall, radioSinglePair;
         EditText editText;
         editText = dialog.findViewById(R.id.edit_count);
         radioShishicai = dialog.findViewById(R.id.radio_shishicai);
         radioPkten = dialog.findViewById(R.id.radio_pkten);
         radioOn = dialog.findViewById(R.id.radio_on);
         radioOff = dialog.findViewById(R.id.radio_off);
-        radioBigSmall=dialog.findViewById(R.id.radio_big_small);
-        radioSinglePair=dialog.findViewById(R.id.radio_single_pair);
+        radioBigSmall = dialog.findViewById(R.id.radio_big_small);
+        radioSinglePair = dialog.findViewById(R.id.radio_single_pair);
         if (name.equals(Rule.SHISHICAI)) {
             radioShishicai.setChecked(true);
         } else {
@@ -203,9 +196,9 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
         } else {
             radioOff.setChecked(true);
         }
-        if (type.equals(Rule.REMIND_TYPE_BIGSMALL)){
+        if (type.equals(Rule.REMIND_TYPE_BIGSMALL)) {
             radioBigSmall.setChecked(true);
-        }else {
+        } else {
             radioSinglePair.setChecked(true);
         }
         editText.setText(count + "");
@@ -213,8 +206,8 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (isThisFragment){//判断当前fragment是否可见，防止错乱
-            isThisFragment=false;
+        if (isThisFragment) {//判断当前fragment是否可见，防止错乱
+            isThisFragment = false;
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             int id = Integer.parseInt((((TextView) listView.getChildAt((int) info.id).findViewById(R.id.id)).getText().toString()));
             switch (item.getItemId()) {
@@ -291,7 +284,7 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void sendeMinder() {
         Cursor cursorRemind = diary.getRecordsOfRmindById(Rule.TABLE_NAME_REMIND, "%%");
-        int id=0;
+        int id = 0;
         if (cursorRemind.moveToFirst()) {
             do {
                 id++;
@@ -302,14 +295,14 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
                 String type = cursorRemind.getString(cursorRemind.getColumnIndex(Rule.REMIND_TYPE));
                 if (state) {//如果该提醒处于开启状态
                     if (name.equals(Rule.PKTEN)) {
-                        if (Rule.isSuitRuleToAlram(Rule.PKTEN,type,count,diary)){
+                        if (Rule.isSuitRuleToAlram(Rule.PKTEN, type, count, diary)) {
                             //发送提醒
-                            SendNotification(Rule.PKTEN,type,count, id);
+                            SendNotification(Rule.PKTEN, type, count, id);
                         }
                     } else {
-                        if (Rule.isSuitRuleToAlram(Rule.SHISHICAI,type,count,diary)){
+                        if (Rule.isSuitRuleToAlram(Rule.SHISHICAI, type, count, diary)) {
                             //发送提醒
-                            SendNotification(Rule.PKTEN,type,count,id);
+                            SendNotification(Rule.PKTEN, type, count, id);
                         }
                     }
                 }
@@ -319,25 +312,24 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
-
     /*
             * @param message
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void SendNotification(String lottery,String type,int count,int id) {
+    private void SendNotification(String lottery, String type, int count, int id) {
         String channelID = "remind";
         String channelName = "remind";
         NotificationChannel channel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
         //创建通知时指定channelID
-        int notifyId=id;
+        int notifyId = id;
         Intent intent = new Intent(getActivity(), MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         Bundle bundle = new Bundle();
         intent.putExtras(bundle);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity())
                 .setSmallIcon(R.drawable.ic_notifications_black_24dp)
-                .setContentTitle(count+"连通知")
-                .setContentText("您的"+lottery+"彩票，出现了"+type+count+"连")
+                .setContentTitle(count + "连通知")
+                .setContentText("您的" + lottery + "彩票，出现了" + type + count + "连")
                 .setContentIntent(PendingIntent.getActivity(getActivity(), notifyId, intent, PendingIntent.FLAG_ONE_SHOT))
                 /**向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合：Notification.DEFAULT_ALL就是3种全部提醒**/
                 .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS);
