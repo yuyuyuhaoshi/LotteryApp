@@ -112,6 +112,7 @@ public class RecordFragment extends Fragment {
         ;
     };
 
+
     private void findView() {
         listViewRecord = view.findViewById(R.id.listViewRecord);
         swipeRefreshLayout = view.findViewById(R.id.swipe);
@@ -168,4 +169,5 @@ public class RecordFragment extends Fragment {
         Rule.doSaveRecord(Rule.SHISHICAI,Rule.REMIND_TYPE_SINGLEPAIR,shishicaiEvenOddCount,diaryDAO);
         init();
     }
+
 }
