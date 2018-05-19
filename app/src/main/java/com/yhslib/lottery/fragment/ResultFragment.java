@@ -351,7 +351,6 @@ public class ResultFragment extends Fragment {
         ArrayList<HashMap<String, Object>> resultList = new ArrayList<>();
         try {
             JSONObject jsonobject = new JSONObject(responseStr);
-
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put("period", jsonobject.getLong("period"));
             hashMap.put("time", jsonobject.getString("time"));

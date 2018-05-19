@@ -20,6 +20,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--闹钟接收广播-->
+        <receiver
+            android:name="com.yhslib.lottery.service.AlramService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="NOTIFICATION" />
+            </intent-filter>
+        </receiver>
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
