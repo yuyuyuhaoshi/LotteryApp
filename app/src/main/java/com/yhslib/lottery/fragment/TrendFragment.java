@@ -55,6 +55,10 @@ public class TrendFragment extends Fragment {
     private SimpleAdapter adapter;
     private LinearLayout header_view;
 
+    private static final int LOTTERY_BEIJING = 0;
+    private static final int LOTTERY_CHONGQING = 1;
+    private int trend_lottery_type = LOTTERY_BEIJING;
+
 
     private MyHandler myHandler;
 
@@ -103,17 +107,29 @@ public class TrendFragment extends Fragment {
                     case 0:
                         selectTableItem = TABLE_ITEM_COUNT;
                         // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
-                        setPkTenAdapter(data);
+                        if(trend_lottery_type == LOTTERY_BEIJING){
+                            setPkTenAdapter(data);
+                        }else{
+                            setShiShiCaiAdapter(data);
+                        }
                         break;
                     case 1:
                         selectTableItem = TABLE_ITEM_SIZE;
                         // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
-                        setPkTenAdapter(data);
+                        if(trend_lottery_type == LOTTERY_BEIJING){
+                            setPkTenAdapter(data);
+                        }else{
+                            setShiShiCaiAdapter(data);
+                        }
                         break;
                     case 2:
                         selectTableItem = TABLE_ITEM_SINGLE_OR_DOUBLE;
                         // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
-                        setPkTenAdapter(data);
+                        if(trend_lottery_type == LOTTERY_BEIJING){
+                            setPkTenAdapter(data);
+                        }else{
+                            setShiShiCaiAdapter(data);
+                        }
                         break;
                 }
             }
@@ -132,10 +148,26 @@ public class TrendFragment extends Fragment {
             @Override
             public void onRefresh() {
                 // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
-                fetchPkTenData();
-                setPkTenAdapter(data);
+                if(trend_lottery_type == LOTTERY_BEIJING){
+                    fetchPkTenData();
+                    setPkTenAdapter(data);
+                }else{
+                    fetchShiShiCaiData();
+                    setShiShiCaiAdapter(data);
+                }
             }
         });
+    }
+
+    public void cutLotteryType(){
+        tabLayout.getTabAt(0).select();
+        if(trend_lottery_type == LOTTERY_BEIJING){
+            setShiShiCaiAdapter(data);
+            trend_lottery_type = LOTTERY_CHONGQING;
+        }else{
+            setPkTenAdapter(data);
+            trend_lottery_type = LOTTERY_BEIJING;
+        }
     }
 
 
@@ -146,7 +178,11 @@ public class TrendFragment extends Fragment {
             switch (msg.what) {
                 case REFRESH_DATA_MESSAGE:
                     // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
-                    fetchPkTenData();
+                    if(trend_lottery_type == LOTTERY_BEIJING){
+                        fetchPkTenData();
+                    }else{
+                        fetchShiShiCaiData();
+                    }
                     sendEmptyMessageDelayed(REFRESH_DATA_MESSAGE, REFRESH_DATA_DELAY);
                     break;
                 default:
@@ -245,7 +281,11 @@ public class TrendFragment extends Fragment {
                         hashMap.put("data" + (j + 1), resultArray[j]);
                     } else if (selectTableItem == 1) {
                         // TODO 重庆时时彩 数值范围与北京Pk10不同 多加个判断
-                        hashMap.put("data" + (j + 1), Integer.parseInt(resultArray[j]) >= 6 ? '大' : '小');
+                        if(trend_lottery_type == LOTTERY_BEIJING){
+                            hashMap.put("data" + (j + 1), Integer.parseInt(resultArray[j]) >= 6 ? '大' : '小');
+                        }else{
+                            hashMap.put("data" + (j + 1), Integer.parseInt(resultArray[j]) >= 5 ? '大' : '小');
+                        }
                     } else if (selectTableItem == 2) {
                         hashMap.put("data" + (j + 1), Integer.parseInt(resultArray[j]) % 2 == 0 ? '双' : '单');
                     }
