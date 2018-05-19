@@ -129,28 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_result:
                     viewPager.setCurrentItem(0);
                     actionBar.setCustomView(R.layout.actionbar_result);
-                    if (actionBar != null) {
-                        result_lottery_select_btn = actionBar.getCustomView().findViewById(R.id.result_lottery_select_btn);
-                        if (result_lottery_type == LOTTERY_BEIJING) {
-                            result_lottery_select_btn.setText(getString(R.string.lottery_beijing));
-                        } else {
-                            result_lottery_select_btn.setText(getString(R.string.lottery_chongqing));
-                        }
-                        result_lottery_select_btn.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (result_lottery_type == LOTTERY_BEIJING) {
-                                    Toast.makeText(MainActivity.this, "切换成重庆时时彩", Toast.LENGTH_SHORT).show();
-                                    result_lottery_type = LOTTERY_CHONGQING;
-                                    result_lottery_select_btn.setText(getString(R.string.lottery_chongqing));
-                                } else {
-                                    Toast.makeText(MainActivity.this, "切换成北京PK拾", Toast.LENGTH_SHORT).show();
-                                    result_lottery_type = LOTTERY_BEIJING;
-                                    result_lottery_select_btn.setText(getString(R.string.lottery_beijing));
-                                }
-                            }
-                        });
-                    }
                     return true;
                 case R.id.navigation_trend:
                     viewPager.setCurrentItem(1);
@@ -166,11 +144,11 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 if (trend_lottery_type == LOTTERY_BEIJING) {
-                                    Toast.makeText(MainActivity.this, "切换成重庆时时彩", Toast.LENGTH_SHORT).show();
+                                    ((TrendFragment)fragments[1]).cutLotteryType();
                                     trend_lottery_type = LOTTERY_CHONGQING;
                                     trend_lottery_select_btn.setText(getString(R.string.lottery_chongqing));
                                 } else {
-                                    Toast.makeText(MainActivity.this, "切换成北京PK拾", Toast.LENGTH_SHORT).show();
+                                    ((TrendFragment)fragments[1]).cutLotteryType();
                                     trend_lottery_type = LOTTERY_BEIJING;
                                     trend_lottery_select_btn.setText(getString(R.string.lottery_beijing));
                                 }
