@@ -3,6 +3,7 @@ package com.yhslib.lottery.fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -35,20 +36,27 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 
 public class TrendFragment extends Fragment {
     private String TAG = "TrendFragment";
     private String data;
+    private final int REFRESH_DATA_MESSAGE = 546;
+    private final int REFRESH_DATA_DELAY = 30000;
+    private final int TABLE_ITEM_COUNT = 0;
+    private final int TABLE_ITEM_SIZE = 1;
+    private final int TABLE_ITEM_SINGLE_OR_DOUBLE = 2;
+    private int selectTableItem = 0;
 
     private View view;
     private TabLayout tabLayout;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private ArrayList<String[]> contentList;
     private ListView listView;
     private SimpleAdapter adapter;
     private LinearLayout header_view;
+
+
+    private MyHandler myHandler;
 
     public static TrendFragment newInstance() {
         Bundle args = new Bundle();
@@ -67,10 +75,14 @@ public class TrendFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        myHandler = new MyHandler();
         findView();
         init();
-        setData();
-//        fetchPkTenData();
+        fetchPkTenData();
+        Message messageRefreshData = myHandler.obtainMessage(REFRESH_DATA_MESSAGE);
+        if (messageRefreshData != null) {
+            myHandler.sendMessage(messageRefreshData);
+        }
     }
 
     private void findView() {
@@ -78,167 +90,6 @@ public class TrendFragment extends Fragment {
         tabLayout = view.findViewById(R.id.tabLayout);
         listView = view.findViewById(R.id.listView);
         header_view = view.findViewById(R.id.view);
-    }
-
-    private void setData() {
-//        View v = LayoutInflater.from(getActivity()).inflate(R.layout.view_trend_header_pkshi, null);
-//        header_view.addView(v);
-//        contentList = new ArrayList<>();
-//        contentList.add(new String[]{"101", "单", "双", "单", "单", "双", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "双", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "双", "单", "单", "单", "单", "单", "单", "单", "双", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "双", "单", "双", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "双", "双", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "双", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "双", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "双", "双", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "双", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "双", "双", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "双", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "双", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "双", "单", "单", "单", "单", "双", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "双", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "双", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "单", "单", "单", "单", "双", "双", "单", "单", "单"});
-//        contentList.add(new String[]{"101", "单", "双", "单", "单", "单", "单", "单", "单", "单", "单"});
-//        ArrayList<Map<String, Object>> data = new ArrayList<>();
-//        for (int i = 0; i < contentList.size(); i++) {
-//            String[] row = contentList.get(i);
-//            Map<String, Object> map = new HashMap<>();
-//            map.put("no", row[0]);
-//            map.put("data1", row[1]);
-//            map.put("data2", row[2]);
-//            map.put("data3", row[3]);
-//            map.put("data4", row[4]);
-//            map.put("data5", row[5]);
-//            map.put("data6", row[6]);
-//            map.put("data7", row[7]);
-//            map.put("data8", row[8]);
-//            map.put("data9", row[9]);
-//            map.put("data10", row[10]);
-//            data.add(map);
-//        }
-//        String[] from = {"no", "data1", "data2", "data3", "data4", "data5", "data6", "data7", "data8", "data9", "data10"};
-//        int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5, R.id.data6, R.id.data7, R.id.data8, R.id.data9, R.id.data10};
-//        adapter = new SimpleAdapter(getActivity(), data, R.layout.list_trend_pkten, from, to) {
-//            @Override
-//            public int getItemViewType(int position) {
-//                return (position % 2);
-//            }
-//
-//            @Override
-//            public int getViewTypeCount() {
-//                return 2;
-//            }
-//
-//            @Override
-//            public View getView(int position, View convertView, ViewGroup parent) {
-//                View v;
-//                v = super.getView(position, convertView, parent);
-//                if (v != null && position % 2 == 0) {
-//                    v.setBackgroundResource(R.color.color_trend_bg);
-//                }
-//                for (int j = 0; j < ((LinearLayout) v).getChildCount(); j++) {
-//                    TextView textView = (TextView) ((LinearLayout) v).getChildAt(j);
-//                    if (textView.getText().equals("单") || textView.getText().equals("小")) {
-//                        textView.setTextColor(getResources().getColor(R.color.color_trend_text1));
-//                    } else if (textView.getText().equals("双") || textView.getText().equals("大")) {
-//                        textView.setTextColor(getResources().getColor(R.color.color_trend_text2));
-//                    }
-//                }
-//                return v;
-//            }
-//        };
-        View v = LayoutInflater.from(getActivity()).inflate(R.layout.view_trend_header_shishicai, null);
-        header_view.addView(v);
-        contentList = new ArrayList<>();
-        contentList.add(new String[]{"101", "单", "双", "单", "单", "双"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "双", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "双"});
-        contentList.add(new String[]{"101", "双", "双", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "双", "单"});
-        contentList.add(new String[]{"101", "单", "单", "双", "双", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "双", "单", "单", "双"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "双", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "双"});
-        contentList.add(new String[]{"101", "双", "双", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "双", "单"});
-        contentList.add(new String[]{"101", "单", "单", "双", "双", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "双", "单", "单", "双"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "双", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "双"});
-        contentList.add(new String[]{"101", "双", "双", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        contentList.add(new String[]{"101", "单", "单", "单", "单", "单"});
-        ArrayList<Map<String, Object>> data = new ArrayList<>();
-        for (int i = 0; i < contentList.size(); i++) {
-            String[] row = contentList.get(i);
-            Map<String, Object> map = new HashMap<>();
-            map.put("no", row[0]);
-            map.put("data1", row[1]);
-            map.put("data2", row[2]);
-            map.put("data3", row[3]);
-            map.put("data4", row[4]);
-            map.put("data5", row[5]);
-            data.add(map);
-        }
-        String[] from = {"no", "data1", "data2", "data3", "data4", "data5"};
-        int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5};
-        adapter = new SimpleAdapter(getActivity(), data, R.layout.list_trend_shishicai, from, to) {
-            @Override
-            public int getItemViewType(int position) {
-                return (position % 2);
-            }
-
-            @Override
-            public int getViewTypeCount() {
-                return 2;
-            }
-
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View v;
-                v = super.getView(position, convertView, parent);
-                if (v != null && position % 2 == 0) {
-                    v.setBackgroundResource(R.color.color_trend_bg);
-                }
-                for (int j = 0; j < ((LinearLayout) v).getChildCount(); j++) {
-                    TextView textView = (TextView) ((LinearLayout) v).getChildAt(j);
-                    if (textView.getText().equals("单") || textView.getText().equals("小")) {
-                        textView.setTextColor(getResources().getColor(R.color.color_trend_text1));
-                    } else if (textView.getText().equals("双") || textView.getText().equals("大")) {
-                        textView.setTextColor(getResources().getColor(R.color.color_trend_text2));
-                    }
-                }
-                return v;
-            }
-        };
-        listView.setAdapter(adapter);
     }
 
     private void init() {
@@ -250,14 +101,19 @@ public class TrendFragment extends Fragment {
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
                     case 0:
-                        Toast.makeText(getActivity(), "点击了号码", Toast.LENGTH_SHORT).show();
+                        selectTableItem = TABLE_ITEM_COUNT;
+                        // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
+                        setPkTenAdapter(data);
                         break;
                     case 1:
-                        Toast.makeText(getActivity(), "点击了大小", Toast.LENGTH_SHORT).show();
+                        selectTableItem = TABLE_ITEM_SIZE;
+                        // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
+                        setPkTenAdapter(data);
                         break;
-
                     case 2:
-                        Toast.makeText(getActivity(), "点击了单双", Toast.LENGTH_SHORT).show();
+                        selectTableItem = TABLE_ITEM_SINGLE_OR_DOUBLE;
+                        // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
+                        setPkTenAdapter(data);
                         break;
                 }
             }
@@ -275,24 +131,29 @@ public class TrendFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mHandler.sendEmptyMessageDelayed(111, 2000);
+                // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
+                fetchPkTenData();
+                setPkTenAdapter(data);
             }
         });
     }
 
-    private Handler mHandler = new Handler() {
-        public void handleMessage(android.os.Message msg) {
-            switch (msg.what) {
-                case 111:
-                    Toast.makeText(getActivity(), "刷新结束", Toast.LENGTH_SHORT).show();
-                    if (swipeRefreshLayout.isRefreshing()) {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                    break;
 
+    private class MyHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case REFRESH_DATA_MESSAGE:
+                    // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
+                    fetchPkTenData();
+                    sendEmptyMessageDelayed(REFRESH_DATA_MESSAGE, REFRESH_DATA_DELAY);
+                    break;
+                default:
+                    break;
             }
         }
-    };
+    }
 
     private void fetchPkTenData() {
         String url = Url.PkTenList;
@@ -301,21 +162,68 @@ public class TrendFragment extends Fragment {
             public void onResponse(String response) {
                 Log.d(TAG, response);
                 data = response;
-                Log.d(TAG, parseJsonArray(data).toString());
-                ArrayList<HashMap<String, Object>> hm = parseJsonArray(response);
-                String[] from = {"period", "data1", "data2", "data3", "data4", "data5", "data6", "data7", "data8", "data9", "data10"};
-                int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5, R.id.data6, R.id.data7, R.id.data8, R.id.data9, R.id.data10};
-
-                adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_pkten, from, to);
+                // Log.d(TAG, parseJsonArray(data).toString());
+                setPkTenAdapter(data);
+                // Toast.makeText(getActivity(), "刷新成功", Toast.LENGTH_SHORT).show();
+                if (swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Toast.makeText(getActivity(), "数据刷新失败", Toast.LENGTH_SHORT).show();
+                if (swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
         RequestQueue queue = MyApplication.getRequestQueue();
         queue.add(stringRequest);
+    }
+
+    private void fetchShiShiCaiData() {
+        String url = Url.PkTenList;
+        final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                data = response;
+                setShiShiCaiAdapter(response);
+                // Toast.makeText(getActivity(), "刷新成功", Toast.LENGTH_SHORT).show();
+                if (swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(), "数据刷新失败", Toast.LENGTH_SHORT).show();
+                if (swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }
+        });
+        RequestQueue queue = MyApplication.getRequestQueue();
+        queue.add(stringRequest);
+    }
+
+    private void setPkTenAdapter(String data) {
+        ArrayList<HashMap<String, Object>> hm = parseJsonArray(data);
+        String[] from = {"period", "data1", "data2", "data3", "data4", "data5", "data6", "data7", "data8", "data9", "data10"};
+        int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5, R.id.data6, R.id.data7, R.id.data8, R.id.data9, R.id.data10};
+
+        adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_pkten, from, to);
+        listView.setAdapter(adapter);
+    }
+
+    private void setShiShiCaiAdapter(String data) {
+        ArrayList<HashMap<String, Object>> hm = parseJsonArray(data);
+        String[] from = {"period", "data1", "data2", "data3", "data4", "data5"};
+        int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5};
+
+        adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_shishicai, from, to);
+        listView.setAdapter(adapter);
     }
 
     private ArrayList<HashMap<String, Object>> parseJsonArray(String responseStr) {
@@ -332,8 +240,16 @@ public class TrendFragment extends Fragment {
                 String s = userObject.getString("result");
                 String[] resultArray = s.split(" ");
 
-                for (int j=0; j<resultArray.length; j++){
-                    hashMap.put("data" + j, resultArray[j]);
+                for (int j = 0; j < resultArray.length; j++) {
+                    if (selectTableItem == 0) {
+                        hashMap.put("data" + (j + 1), resultArray[j]);
+                    } else if (selectTableItem == 1) {
+                        // TODO 重庆时时彩 数值范围与北京Pk10不同 多加个判断
+                        hashMap.put("data" + (j + 1), Integer.parseInt(resultArray[j]) >= 6 ? '大' : '小');
+                    } else if (selectTableItem == 2) {
+                        hashMap.put("data" + (j + 1), Integer.parseInt(resultArray[j]) % 2 == 0 ? '双' : '单');
+                    }
+
                 }
                 resultList.add(hashMap);
             }
