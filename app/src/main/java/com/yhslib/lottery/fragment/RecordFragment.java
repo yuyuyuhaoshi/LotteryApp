@@ -112,6 +112,7 @@ public class RecordFragment extends Fragment {
         ;
     };
 
+
     private void findView() {
         listViewRecord = view.findViewById(R.id.listViewRecord);
         swipeRefreshLayout = view.findViewById(R.id.swipe);
