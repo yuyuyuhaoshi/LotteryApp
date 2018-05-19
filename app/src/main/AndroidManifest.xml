@@ -8,7 +8,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/pkten"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:name=".Application.MyApplication">
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
@@ -19,6 +20,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    </application>
 
+        <!--闹钟接收广播-->
+        <receiver
+            android:name="com.yhslib.lottery.service.AlramService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="NOTIFICATION" />
+            </intent-filter>
+        </receiver>
+    </application>
+    <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>

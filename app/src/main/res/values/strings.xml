@@ -5,4 +5,6 @@
     <string name="title_notifications">Notifications</string>
     <string name="lottery_chongqing">重庆时时彩</string>
     <string name="lottery_beijing">北京PK拾</string>
+    <string name="lottery_beijing_next_time">下一期北京PK拾:</string>
+    <string name="lottery_chongqing_next_time">下一期重庆时时彩:</string>
 </resources>

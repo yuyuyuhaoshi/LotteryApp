@@ -1,7 +1,11 @@
 package com.yhslib.lottery.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.internal.BottomNavigationItemView;
@@ -14,9 +18,17 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,12 +37,21 @@ import com.yhslib.lottery.fragment.RecordFragment;
 import com.yhslib.lottery.fragment.RemindFragment;
 import com.yhslib.lottery.fragment.ResultFragment;
 import com.yhslib.lottery.fragment.TrendFragment;
+import com.yhslib.lottery.sqlittle.DiaryDAO;
 import com.yhslib.lottery.utils.CustomDialog;
+import com.yhslib.lottery.utils.Rule;
 
 import java.lang.reflect.Field;
 
 public class MainActivity extends AppCompatActivity {
-
+    static final String REMIND_NAME = "name";
+    static final String REMIND_STATE = "state";
+    static final String REMIND_COUNT = "count";
+    static final String PKTEN ="北京PK拾";
+    static final String SHISHICAI="重庆时时彩";
+    static final String REMIND_TYPE = "remind_type";
+    static final String REMIND_TYPE_BIGSMALL = "大小";
+    static final String REMIND_TYPE_SINGLEPAIR = "单双";
     private ViewPager viewPager;
     private Fragment[] fragments;
     private BottomNavigationView navigation;
@@ -38,18 +59,22 @@ public class MainActivity extends AppCompatActivity {
     private Button trend_lottery_select_btn;
     private Button result_lottery_select_btn;
     private TextView add_remind_btn;
+    private TextView set_record_btn;
     private CustomDialog dialog;
-
+    private DiaryDAO remindDAo;
     private static final int LOTTERY_BEIJING = 0;
     private static final int LOTTERY_CHONGQING = 1;
     private int trend_lottery_type = LOTTERY_BEIJING;
     private int result_lottery_type = LOTTERY_BEIJING;
-
+    Window window;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         findView();
+//        window = this.getWindow();
+//        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//        setBarColor();
         init();
     }
 
@@ -67,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(myFragmentPagerAdapter);
         viewPager.addOnPageChangeListener(onPageChangeListener);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        remindDAo=new DiaryDAO(this);
         disableShiftMode(navigation);
     }
 
@@ -75,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.viewPager);
         actionBar = getSupportActionBar();
     }
+
 
     private class MyFragmentPagerAdapter extends FragmentPagerAdapter {
 
@@ -154,6 +181,15 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_record:
                     viewPager.setCurrentItem(2);
                     actionBar.setCustomView(R.layout.actionbar_record);
+                    if (actionBar != null) {
+                        set_record_btn = actionBar.getCustomView().findViewById(R.id.add_record_btn);
+                        set_record_btn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                set_record_dialog();
+                            }
+                        });
+                    }
                     return true;
                 case R.id.navigation_remind:
                     viewPager.setCurrentItem(3);
@@ -172,6 +208,8 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
     };
+
+
 
     private ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
@@ -237,17 +275,47 @@ public class MainActivity extends AppCompatActivity {
         }).setNegativeButton("取消", null).show();
     }
 
+
+    //在提醒界面，选择加好可添加新提醒
+    //数据存入数据库，表名为remind
     private void add_remind_dialog() {
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                EditText editTextCount;
+                RadioButton radioPkten,radioOn,radioTypeBigSmall;
+                radioPkten=dialog.findViewById(R.id.radio_pkten);
+                radioOn=dialog.findViewById(R.id.radio_on);
+                radioTypeBigSmall=dialog.findViewById(R.id.radio_big_small);
+                editTextCount=dialog.findViewById(R.id.edit_count);
+                String name,type;
+                boolean state ;
+                int count;
                 switch (view.getId()) {
                     case R.id.cancel_btn:
                         dialog.dismiss();
                         break;
                     case R.id.ok_btn:
                         Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
+                        if (radioPkten.isChecked()){
+                            name =PKTEN;
+                        }else {
+                            name=SHISHICAI;
+                        }
+                        if (radioOn.isChecked()){
+                            state = true;
+                        }else {
+                            state = false;
+                        }
+                        if (radioTypeBigSmall.isChecked()){
+                            type=REMIND_TYPE_BIGSMALL;
+                        }else {
+                            type=REMIND_TYPE_SINGLEPAIR;
+                        }
+                        count = Integer.parseInt(editTextCount.getText().toString());
+                        remindDAo.insertRecordOfRemind(name,state,count,type);
                         dialog.dismiss();
+                        ((RemindFragment)fragments[3]).init();
                         break;
                 }
             }
@@ -264,6 +332,82 @@ public class MainActivity extends AppCompatActivity {
                 .addViewOnclick(R.id.ok_btn, listener)
                 .build();
         dialog.show();
+        RadioButton radioShishicai,radioOn,radioTypeBigSmall;
+        radioShishicai=dialog.findViewById(R.id.radio_shishicai);
+        radioOn=dialog.findViewById(R.id.radio_on);
+        radioTypeBigSmall=dialog.findViewById(R.id.radio_big_small);
+        radioTypeBigSmall.setChecked(true);
+        radioShishicai.setChecked(true);
+        radioOn.setChecked(true);
     }
+
+    private void set_record_dialog() {
+        View.OnClickListener listener = new View.OnClickListener() {
+            @SuppressLint("CutPasteId")
+            @Override
+            public void onClick(View view) {
+                EditText shishicaiBigSmallCount=dialog.findViewById(R.id.edit_shishicai_daxiao_count);
+                EditText shishicaiEvenOddCount=dialog.findViewById(R.id.edit_shishicai_danshuang_count);
+                EditText pktenBigSmallCount=dialog.findViewById(R.id.edit_pkten_daxiao_count);
+                EditText pktenEvenOddCount=dialog.findViewById(R.id.edit_pkten_danshuang_count);
+                switch (view.getId()) {
+                    case R.id.cancel_btn:
+                        dialog.dismiss();
+                        break;
+                    case R.id.ok_btn:
+                        remindDAo.updateRecordSet(shishicaiBigSmallCount.getText().toString(),shishicaiEvenOddCount.getText().toString(),
+                                pktenBigSmallCount.getText().toString(),pktenEvenOddCount.getText().toString());
+                        dialog.dismiss();
+                        ((RecordFragment)fragments[2]).init();
+                        ((RecordFragment)fragments[2]).saveRecord();
+                        break;
+                }
+            }
+        };
+
+        CustomDialog.Builder builder = new CustomDialog.Builder(this);
+        dialog = builder
+                .style(R.style.Dialog)
+                .heightDimenRes(R.dimen.dialog_record_height)
+                .widthDimenRes(R.dimen.dialog_width)
+                .cancelTouchout(false)
+                .view(R.layout.dialog_record)
+                .addViewOnclick(R.id.cancel_btn, listener)
+                .addViewOnclick(R.id.ok_btn, listener)
+                .build();
+        dialog.show();
+        EditText shishicaiBigSmallCount=dialog.findViewById(R.id.edit_shishicai_daxiao_count);
+        EditText shishicaiEvenOddCount=dialog.findViewById(R.id.edit_shishicai_danshuang_count);
+        EditText pktenBigSmallCount=dialog.findViewById(R.id.edit_pkten_daxiao_count);
+        EditText pktenEvenOddCount=dialog.findViewById(R.id.edit_pkten_danshuang_count);
+        Cursor cursor =remindDAo.getRecordSet();
+        cursor.moveToFirst();
+        shishicaiBigSmallCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_SHISHICAI_BIGSMALL)));
+        shishicaiEvenOddCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_SHISHICAI_EVENODD)));
+        pktenBigSmallCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_BIGSMALL)));
+        pktenEvenOddCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_EVENODD)));
+    }
+
+    public void setBarColor() {
+        ViewGroup decorViewGroup = (ViewGroup) window.getDecorView();
+        View statusBarView = new View(window.getContext());
+        int statusBarHeight = getStatusBarHeight(window.getContext());
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, statusBarHeight);
+        params.gravity = Gravity.TOP;
+        statusBarView.setLayoutParams(params);
+        statusBarView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+        decorViewGroup.addView(statusBarView);
+    }
+
+    private static int getStatusBarHeight(Context context) {//获取状态栏高度
+        int statusBarHeight = 0;
+        Resources res = context.getResources();
+        int resourceId = res.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            statusBarHeight = res.getDimensionPixelSize(resourceId);
+        }
+        return statusBarHeight;
+    }
+
 
 }

@@ -11,49 +11,9 @@
         android:background="@drawable/dialog_title"
         android:gravity="center"
         android:padding="8dp"
-        android:text="提醒设置"
+        android:text="阈值设置"
         android:textColor="@android:color/white"
         android:textSize="22sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="10dp"
-            android:text="类型:"
-            android:textColor="#212121"
-            android:textSize="18sp" />
-
-        <RadioGroup
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/radio_shishicai"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/lottery_chongqing" />
-
-            <RadioButton
-                android:id="@+id/radio_pkten"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/lottery_beijing" />
-
-        </RadioGroup>
-
-    </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -66,17 +26,39 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="10dp"
-            android:text="次数:"
+            android:text="  北京PK10单双阈值:"
             android:textColor="#212121"
             android:textSize="18sp" />
 
         <EditText
-            android:id="@+id/edit_count"
+            android:id="@+id/edit_pkten_danshuang_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
             android:inputType="number" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:text="  北京PK10大小阈值:"
+            android:textColor="#212121"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/edit_pkten_daxiao_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="30dp"
+            android:inputType="number" />
     </LinearLayout>
 
     <LinearLayout
@@ -91,31 +73,18 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="10dp"
-            android:text="状态:"
+            android:text="重庆时时彩单双阈值:"
             android:textColor="#212121"
             android:textSize="18sp" />
 
-        <RadioGroup
+        <EditText
+            android:id="@+id/edit_shishicai_danshuang_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/radio_on"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="开启" />
-
-            <RadioButton
-                android:id="@+id/radio_off"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="关闭" />
-
-        </RadioGroup>
-
+            android:layout_marginRight="30dp"
+            android:inputType="number" />
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -128,32 +97,17 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="10dp"
-            android:text="类型:"
+            android:text="重庆时时彩大小阈值:"
             android:textColor="#212121"
             android:textSize="18sp" />
 
-        <RadioGroup
+        <EditText
+            android:id="@+id/edit_shishicai_daxiao_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <RadioButton
-                android:id="@+id/radio_big_small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="大小" />
-
-            <RadioButton
-                android:id="@+id/radio_single_pair"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="单双" />
-
-        </RadioGroup>
-
+            android:layout_marginRight="30dp"
+            android:inputType="number" />
     </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
