@@ -282,7 +282,7 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
     调用此方法将遍历数据库是否有满足用户设定的情况，有的话就发送提醒。
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void sendeMinder() {
+    public  void sendeMinder() {
         Cursor cursorRemind = diary.getRecordsOfRmindById(Rule.TABLE_NAME_REMIND, "%%");
         int id = 0;
         if (cursorRemind.moveToFirst()) {

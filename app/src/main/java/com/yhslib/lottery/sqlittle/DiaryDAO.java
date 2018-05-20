@@ -78,13 +78,29 @@ public class DiaryDAO {
      * @参数,tableName 表名，id期号，values开奖号码，time开奖时间
      */
     public boolean insertLotteryHistory(String tableName, int id, String values, String time) {
+        int count=0;
+        boolean isHave=false;
         Log.d(TAG, "insertItem before getWritableDatabase");
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(Rule.LOTTERY_ID, id);
         cv.put(Rule.LOTTERY_VALUES, values);
         cv.put(Rule.LOTTERY_TIME, time);
-        return db.insert(tableName, null, cv) != -1;
+        Cursor cursor = getRecordsOfLotteryById(tableName,"%%");
+        if (cursor.moveToFirst()){
+            do {
+                count++;
+                String lotteryId=cursor.getString(cursor.getColumnIndex(Rule.LOTTERY_ID));
+                if (lotteryId.equals(id+"")){
+                    isHave=true;
+                }
+            }while (cursor.moveToNext()&&count<50);
+        }
+        if (!isHave){//如果数据库已经存在这个数据，就不插入
+            return db.insert(tableName, null, cv) != -1;
+        }else {
+            return false;
+        }
     }
 
     /*
@@ -194,7 +210,7 @@ public class DiaryDAO {
             SQLiteDatabase db = mOpenHelper.getReadableDatabase();
             Log.d(TAG, "showItems after getReadableDatabase");
             String col[] = {"_id", Rule.LOTTERY_ID, Rule.LOTTERY_VALUES, Rule.LOTTERY_TIME};
-            cur = db.query(tableName, col, "_id like ?", arg, null, null, null);
+            cur = db.query(tableName, col, "_id like ?", arg, null, null, Rule.LOTTERY_ID+" desc");
             return cur;
         } catch (SQLException e) {
 
