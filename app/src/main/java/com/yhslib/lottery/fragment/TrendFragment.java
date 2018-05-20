@@ -27,7 +27,10 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.yhslib.lottery.Application.MyApplication;
 import com.yhslib.lottery.R;
+import com.yhslib.lottery.activity.MainActivity;
 import com.yhslib.lottery.config.Url;
+import com.yhslib.lottery.sqlittle.DiaryDAO;
+import com.yhslib.lottery.utils.Rule;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -150,7 +153,6 @@ public class TrendFragment extends Fragment {
                 // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
                 fetchPkTenData();
                 fetchShiShiCaiData();
-
             }
         });
     }
@@ -176,11 +178,8 @@ public class TrendFragment extends Fragment {
             super.handleMessage(msg);
             switch (msg.what) {
                 case REFRESH_DATA_MESSAGE:
-
                     fetchPkTenData();
-
                     fetchShiShiCaiData();
-
                     sendEmptyMessageDelayed(REFRESH_DATA_MESSAGE, REFRESH_DATA_DELAY);
                     break;
                 default:
@@ -194,8 +193,9 @@ public class TrendFragment extends Fragment {
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, response);
+                // Log.d(TAG, response);
                 data = response;
+                createDataToDB(data, Rule.TABLE_NAME_PKTEN);
                 // Log.d(TAG, parseJsonArray(data).toString());
                 if (trend_lottery_type == LOTTERY_BEIJING) {
                     setPkTenAdapter(data);
@@ -223,8 +223,9 @@ public class TrendFragment extends Fragment {
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, response);
+                // Log.d(TAG, response);
                 data = response;
+                createDataToDB(data, Rule.TABLE_NAME_SHISHICAI);
                 if (trend_lottery_type == LOTTERY_CHONGQING) {
                     setShiShiCaiAdapter(response);
                 }
@@ -233,7 +234,6 @@ public class TrendFragment extends Fragment {
                 if (swipeRefreshLayout.isRefreshing()) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
-
             }
         }, new Response.ErrorListener() {
             @Override
@@ -306,5 +306,28 @@ public class TrendFragment extends Fragment {
         } catch (JSONException e) {
         }
         return resultList;
+    }
+
+    private Boolean createDataToDB(String response, String tableName) {
+
+        DiaryDAO diaryDAO = new DiaryDAO(getActivity());
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray resultsArray = jsonObject.getJSONArray("results");
+            for (int i = 0; i < resultsArray.length(); i++) {
+                JSONObject dataObject = (JSONObject) resultsArray.opt(i);
+                String period = dataObject.getString("period");
+                String result = dataObject.getString("result");
+                String time = dataObject.getString("time");
+                diaryDAO.insertLotteryHistory(tableName, period, result, time);
+            }
+
+            //Log.d(TAG, resultList.toString());
+            Rule.saveRecord(diaryDAO);
+            return true;
+        } catch (JSONException e) {
+
+        }
+        return false;
     }
 }

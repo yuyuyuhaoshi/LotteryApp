@@ -156,18 +156,18 @@ public class RecordFragment extends Fragment {
         return data;
     }
 
-    public void saveRecord(){
-        Cursor cursor = diaryDAO.getRecordSet();
-        cursor.moveToFirst();
-        int shishicaiBigSmallCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_SHISHICAI_BIGSMALL)));
-        int shishicaiEvenOddCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_SHISHICAI_EVENODD)));
-        int pktenBigSmallCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_BIGSMALL)));
-        int pktenEvenOddCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_EVENODD)));
-        Rule.doSaveRecord(Rule.PKTEN,Rule.REMIND_TYPE_BIGSMALL,pktenBigSmallCount,diaryDAO);
-        Rule.doSaveRecord(Rule.PKTEN,Rule.REMIND_TYPE_SINGLEPAIR,pktenEvenOddCount,diaryDAO);
-        Rule.doSaveRecord(Rule.SHISHICAI,Rule.REMIND_TYPE_BIGSMALL,shishicaiBigSmallCount,diaryDAO);
-        Rule.doSaveRecord(Rule.SHISHICAI,Rule.REMIND_TYPE_SINGLEPAIR,shishicaiEvenOddCount,diaryDAO);
-        init();
-    }
+//    public void saveRecord(){
+//        Cursor cursor = diaryDAO.getRecordSet();
+//        cursor.moveToFirst();
+//        int shishicaiBigSmallCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_SHISHICAI_BIGSMALL)));
+//        int shishicaiEvenOddCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_SHISHICAI_EVENODD)));
+//        int pktenBigSmallCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_BIGSMALL)));
+//        int pktenEvenOddCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_EVENODD)));
+//        Rule.doSaveRecord(Rule.PKTEN,Rule.REMIND_TYPE_BIGSMALL,pktenBigSmallCount,diaryDAO);
+//        Rule.doSaveRecord(Rule.PKTEN,Rule.REMIND_TYPE_SINGLEPAIR,pktenEvenOddCount,diaryDAO);
+//        Rule.doSaveRecord(Rule.SHISHICAI,Rule.REMIND_TYPE_BIGSMALL,shishicaiBigSmallCount,diaryDAO);
+//        Rule.doSaveRecord(Rule.SHISHICAI,Rule.REMIND_TYPE_SINGLEPAIR,shishicaiEvenOddCount,diaryDAO);
+//        init();
+//    }
 
 }

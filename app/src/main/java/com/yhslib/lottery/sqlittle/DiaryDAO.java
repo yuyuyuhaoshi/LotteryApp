@@ -97,6 +97,7 @@ public class DiaryDAO {
             }while (cursor.moveToNext()&&count<50);
         }
         if (!isHave){//如果数据库已经存在这个数据，就不插入
+            Log.d(TAG, cv.toString());
             return db.insert(tableName, null, cv) != -1;
         }else {
             return false;
