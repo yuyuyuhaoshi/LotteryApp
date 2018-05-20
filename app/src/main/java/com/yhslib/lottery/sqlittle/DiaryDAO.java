@@ -77,7 +77,7 @@ public class DiaryDAO {
      * 插入新的开奖记录
      * @参数,tableName 表名，id期号，values开奖号码，time开奖时间
      */
-    public boolean insertLotteryHistory(String tableName, int id, String values, String time) {
+    public boolean insertLotteryHistory(String tableName, String id, String values, String time) {
         int count=0;
         boolean isHave=false;
         Log.d(TAG, "insertItem before getWritableDatabase");
@@ -107,7 +107,7 @@ public class DiaryDAO {
      * 插入新的自定义事件记录
      * @参数,name 彩票名，id跳出期号，type类型，value具体内容，position第几个球，count连走了几期，time跳出时间
      */
-    public boolean insertRecord(String name, int id, String type, String values, int position, int count, String time) {
+    public boolean insertRecord(String name, String id, String type, String values, int position, int count, String time) {
         Log.d(TAG, "insertItem before getWritableDatabase");
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
