@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     static final String REMIND_TYPE_BIGSMALL = "大小";
     static final String REMIND_TYPE_SINGLEPAIR = "单双";
     private ViewPager viewPager;
-    private Fragment[] fragments;
+    public Fragment[] fragments;
     private BottomNavigationView navigation;
     private ActionBar actionBar;
     private Button trend_lottery_select_btn;
@@ -337,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
                                 pktenBigSmallCount.getText().toString(),pktenEvenOddCount.getText().toString());
                         dialog.dismiss();
                         ((RecordFragment)fragments[2]).init();
-                        ((RecordFragment)fragments[2]).saveRecord();
+//                        ((RecordFragment)fragments[2]).saveRecord();
                         break;
                 }
             }
