@@ -107,8 +107,8 @@ public class Rule {
     }
 
     public static void doSaveRecord(String lotteryName, String type, int count, DiaryDAO diary) {
-        String resultTime;// 每个元素分别代表id跳出彩票的id,values连续内容,position所在位置,count连续多数,time跳出的时间
-        int resultId, resultPosition, resultCount;
+        String resultId,resultTime;// 每个元素分别代表id跳出彩票的id,values连续内容,position所在位置,count连续多数,time跳出的时间
+        int  resultPosition, resultCount;
         String[] resultValues;
         Cursor cursorLottery;
         int[][] countLottery;
@@ -133,7 +133,7 @@ public class Rule {
         }
         if (cursorLottery.moveToFirst()) {
             String[] firstValues = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_VALUES)).split(" ");
-            resultId = Integer.parseInt(cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_ID)));
+            resultId = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_ID));
             resultTime = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_TIME));
             resultValues = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_VALUES)).split(" ");
             if (cursorLottery.moveToNext()) {
@@ -192,7 +192,7 @@ public class Rule {
                                 String idHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_ID));
                                 String typeHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_TYPE));
                                 String positionHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_POSITION));
-                                if (lotteryName.equals(nameHave) && idHave.equals(resultId + "") && typeHave.equals(type) && positionHave.equals(resultPosition + "")) {//防止重复插入相同的数据
+                                if (lotteryName.equals(nameHave) && idHave.equals(resultId) && typeHave.equals(type) && positionHave.equals(resultPosition + "")) {//防止重复插入相同的数据
                                     isHave = true;
                                 }
                             } while (cursor.moveToNext());

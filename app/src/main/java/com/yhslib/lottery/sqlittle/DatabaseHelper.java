@@ -49,7 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + Rule.LOTTERY_VALUES + " TEXT NOT NULL, " + Rule.LOTTERY_TIME + " TEXT NOT NULL " +  ");";
         db.execSQL(sql);
 
-        sql= "CREATE TABLE " + Rule.TABLE_NAME_RECORD + " (" + Rule.ID + " INTEGER PRIMARY KEY,"+ Rule.RECORD_ID + " INTEGER NOT NULL, "
+        sql= "CREATE TABLE " + Rule.TABLE_NAME_RECORD + " (" + Rule.ID + " INTEGER PRIMARY KEY,"+ Rule.RECORD_ID + " TEXT NOT NULL, "
                 + Rule.RECORD_NAME + " TEXT NOT NULL, " + Rule.RECORD_TYPE + " TEXT NOT NULL, "
                 + Rule.RECORD_VALUE + " TEXT NOT NULL, " + Rule.RECORD_POSITION + " TEXT NOT NULL, "
                 + Rule.RECORD_COUNT + " TEXT NOT NULL, " + Rule.RECORD_TIME + " TEXT NOT NULL " +");";
