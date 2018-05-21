@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     static final String REMIND_TYPE_BIGSMALL = "大小";
     static final String REMIND_TYPE_SINGLEPAIR = "单双";
     private ViewPager viewPager;
-    private Fragment[] fragments;
+    public Fragment[] fragments;
     private BottomNavigationView navigation;
     private ActionBar actionBar;
     private Button trend_lottery_select_btn;
@@ -129,28 +129,6 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_result:
                     viewPager.setCurrentItem(0);
                     actionBar.setCustomView(R.layout.actionbar_result);
-                    if (actionBar != null) {
-                        result_lottery_select_btn = actionBar.getCustomView().findViewById(R.id.result_lottery_select_btn);
-                        if (result_lottery_type == LOTTERY_BEIJING) {
-                            result_lottery_select_btn.setText(getString(R.string.lottery_beijing));
-                        } else {
-                            result_lottery_select_btn.setText(getString(R.string.lottery_chongqing));
-                        }
-                        result_lottery_select_btn.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (result_lottery_type == LOTTERY_BEIJING) {
-                                    Toast.makeText(MainActivity.this, "切换成重庆时时彩", Toast.LENGTH_SHORT).show();
-                                    result_lottery_type = LOTTERY_CHONGQING;
-                                    result_lottery_select_btn.setText(getString(R.string.lottery_chongqing));
-                                } else {
-                                    Toast.makeText(MainActivity.this, "切换成北京PK拾", Toast.LENGTH_SHORT).show();
-                                    result_lottery_type = LOTTERY_BEIJING;
-                                    result_lottery_select_btn.setText(getString(R.string.lottery_beijing));
-                                }
-                            }
-                        });
-                    }
                     return true;
                 case R.id.navigation_trend:
                     viewPager.setCurrentItem(1);
@@ -166,11 +144,11 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 if (trend_lottery_type == LOTTERY_BEIJING) {
-                                    Toast.makeText(MainActivity.this, "切换成重庆时时彩", Toast.LENGTH_SHORT).show();
+                                    ((TrendFragment)fragments[1]).cutLotteryType();
                                     trend_lottery_type = LOTTERY_CHONGQING;
                                     trend_lottery_select_btn.setText(getString(R.string.lottery_chongqing));
                                 } else {
-                                    Toast.makeText(MainActivity.this, "切换成北京PK拾", Toast.LENGTH_SHORT).show();
+                                    ((TrendFragment)fragments[1]).cutLotteryType();
                                     trend_lottery_type = LOTTERY_BEIJING;
                                     trend_lottery_select_btn.setText(getString(R.string.lottery_beijing));
                                 }
@@ -187,6 +165,12 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 set_record_dialog();
+                            }
+                        });
+                        actionBar.getCustomView().findViewById(R.id.screen).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                set_record_screen();
                             }
                         });
                     }
@@ -296,7 +280,6 @@ public class MainActivity extends AppCompatActivity {
                         dialog.dismiss();
                         break;
                     case R.id.ok_btn:
-                        Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
                         if (radioPkten.isChecked()){
                             name =PKTEN;
                         }else {
@@ -312,10 +295,15 @@ public class MainActivity extends AppCompatActivity {
                         }else {
                             type=REMIND_TYPE_SINGLEPAIR;
                         }
-                        count = Integer.parseInt(editTextCount.getText().toString());
-                        remindDAo.insertRecordOfRemind(name,state,count,type);
-                        dialog.dismiss();
-                        ((RemindFragment)fragments[3]).init();
+                        try {
+                            count = Integer.parseInt(editTextCount.getText().toString());
+                            remindDAo.insertRecordOfRemind(name,state,count,type);
+                            dialog.dismiss();
+                            ((RemindFragment)fragments[3]).init();
+                            Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
+                        }catch (Exception e){
+                            Toast.makeText(MainActivity.this, "输入的内容不合法", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                 }
             }
@@ -358,8 +346,24 @@ public class MainActivity extends AppCompatActivity {
                         remindDAo.updateRecordSet(shishicaiBigSmallCount.getText().toString(),shishicaiEvenOddCount.getText().toString(),
                                 pktenBigSmallCount.getText().toString(),pktenEvenOddCount.getText().toString());
                         dialog.dismiss();
+                        Cursor cursor =remindDAo.getRecordsOfLotteryById(Rule.TABLE_NAME_PKTEN,"%%");
+                        Cursor cursor2 =remindDAo.getRecordsOfLotteryById(Rule.TABLE_NAME_SHISHICAI,"%%");
+                        int count=0;
+                        if (cursor.moveToFirst()){
+                            do {
+                                count++;
+                                remindDAo.updateLotteryHistoryIsRead(Rule.PKTEN,cursor.getString(cursor.getColumnIndex(Rule.ID)),0);
+                            }while (cursor.moveToNext()&&count<50);
+                        }
+                        count=0;
+                        if (cursor2.moveToFirst()){
+                            do {
+                                count++;
+                                remindDAo.updateLotteryHistoryIsRead(Rule.SHISHICAI,cursor2.getString(cursor2.getColumnIndex(Rule.ID)),0);
+                            }while (cursor2.moveToNext()&&count<50);
+                        }
                         ((RecordFragment)fragments[2]).init();
-                        ((RecordFragment)fragments[2]).saveRecord();
+                        Rule.saveRecord(remindDAo,MainActivity.this);
                         break;
                 }
             }
@@ -386,6 +390,44 @@ public class MainActivity extends AppCompatActivity {
         shishicaiEvenOddCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_SHISHICAI_EVENODD)));
         pktenBigSmallCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_BIGSMALL)));
         pktenEvenOddCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_EVENODD)));
+    }
+
+    private void set_record_screen() {
+        View.OnClickListener listener = new View.OnClickListener() {
+            @SuppressLint("CutPasteId")
+            @Override
+            public void onClick(View view) {
+                EditText editText ;
+                editText = dialog.findViewById(R.id.edit_screen_count);
+                switch (view.getId()) {
+                    case R.id.cancel_btn:
+                        dialog.dismiss();
+                        break;
+                    case R.id.ok_btn:
+                        dialog.dismiss();
+                        try {
+                            ((RecordFragment)fragments[2]).min= Integer.parseInt(editText.getText().toString());
+                        }catch (Exception e){
+                            Toast.makeText(MainActivity.this, "输入的内容不合法", Toast.LENGTH_SHORT).show();
+                        }
+                        ((RecordFragment)fragments[2]).init();
+                        Rule.saveRecord(remindDAo,MainActivity.this);
+                        break;
+                }
+            }
+        };
+
+        CustomDialog.Builder builder = new CustomDialog.Builder(this);
+        dialog = builder
+                .style(R.style.Dialog)
+                .heightDimenRes(R.dimen.dialog_screen_height)
+                .widthDimenRes(R.dimen.dialog_width)
+                .cancelTouchout(false)
+                .view(R.layout.dialog_record_screen)
+                .addViewOnclick(R.id.cancel_btn, listener)
+                .addViewOnclick(R.id.ok_btn, listener)
+                .build();
+        dialog.show();
     }
 
     public void setBarColor() {

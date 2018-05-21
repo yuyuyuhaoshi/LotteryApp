@@ -12,19 +12,21 @@ import com.yhslib.lottery.utils.Rule;
 public class DiaryDAO {
 
     private static final String TAG = "xyz";
-    private DatabaseHelper mOpenHelper;
+    private static DatabaseHelper mOpenHelper;
 
     public DiaryDAO(Context context) {
-        mOpenHelper = new DatabaseHelper(context);
+        if (mOpenHelper==null){
+            mOpenHelper = new DatabaseHelper(context);
+        }
     }
 
     /*
      * 重新建立数据表
      */
     public boolean createTable() {
-        Log.d(TAG, "CreateTable before getWritableDatabase");
+//        Log.d(TAG, "CreateTable before getWritableDatabase");
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        Log.d(TAG, "CreateTable after getWritableDatabase");
+//        Log.d(TAG, "CreateTable after getWritableDatabase");
 
         try {
 
@@ -44,9 +46,9 @@ public class DiaryDAO {
      * 删除数据表
      */
     public boolean dropTable() {
-        Log.d(TAG, "drop table before getWritableDatabase");
+//        Log.d(TAG, "drop table before getWritableDatabase");
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        Log.d(TAG, "drop table after getWritableDatabase");
+//        Log.d(TAG, "drop table after getWritableDatabase");
         try {
             mOpenHelper.dropTableDiary(db);
             return true;
@@ -63,7 +65,7 @@ public class DiaryDAO {
      * @参数,name提醒的彩票类型， state提醒是否开启， count连走个数
      */
     public boolean insertRecordOfRemind(String name, Boolean state, int count, String type) {
-        Log.d(TAG, "insertItem before getWritableDatabase");
+//        Log.d(TAG, "insertItem before getWritableDatabase");
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(Rule.REMIND_NAME, name);
@@ -77,15 +79,16 @@ public class DiaryDAO {
      * 插入新的开奖记录
      * @参数,tableName 表名，id期号，values开奖号码，time开奖时间
      */
-    public boolean insertLotteryHistory(String tableName, String id, String values, String time) {
+    public boolean insertLotteryHistory(String tableName, String id, String values, String time,int isRead) {
         int count=0;
         boolean isHave=false;
-        Log.d(TAG, "insertItem before getWritableDatabase");
+//        Log.d(TAG, "insertItem before getWritableDatabase");
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(Rule.LOTTERY_ID, id);
         cv.put(Rule.LOTTERY_VALUES, values);
         cv.put(Rule.LOTTERY_TIME, time);
+        cv.put(Rule.LOTTERY_IS_READ,isRead);
         Cursor cursor = getRecordsOfLotteryById(tableName,"%%");
         if (cursor.moveToFirst()){
             do {
@@ -97,8 +100,37 @@ public class DiaryDAO {
             }while (cursor.moveToNext()&&count<50);
         }
         if (!isHave){//如果数据库已经存在这个数据，就不插入
+            Log.d(TAG, cv.toString());
             return db.insert(tableName, null, cv) != -1;
         }else {
+            return false;
+        }
+    }
+
+    /*
+     * 插入新的开奖记录
+     * @参数,tableName 表名，id期号，values开奖号码，time开奖时间
+     */
+    public boolean updateLotteryHistoryIsRead(String lotteryName,String id,int isRead) {
+        String[] arg = {id};
+        try {
+            Log.d(TAG, "Do update before getWritableDatabase");
+            SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put(Rule.LOTTERY_IS_READ, isRead);
+            int x;
+            if (lotteryName.equals(Rule.PKTEN)){
+                x = db.update(Rule.TABLE_NAME_PKTEN, cv, "_id=?", arg);
+            }else {
+                x = db.update(Rule.TABLE_NAME_SHISHICAI, cv, "_id=?", arg);
+            }
+
+            if (x > 0) {
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            Log.d(TAG, e.getMessage());
             return false;
         }
     }
@@ -108,7 +140,7 @@ public class DiaryDAO {
      * @参数,name 彩票名，id跳出期号，type类型，value具体内容，position第几个球，count连走了几期，time跳出时间
      */
     public boolean insertRecord(String name, String id, String type, String values, int position, int count, String time) {
-        Log.d(TAG, "insertItem before getWritableDatabase");
+//        Log.d(TAG, "insertItem before getWritableDatabase");
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(Rule.RECORD_NAME, name);
@@ -129,11 +161,11 @@ public class DiaryDAO {
         String[] arg = {id};
         Cursor cur = null;
         try {
-            Log.d(TAG, "showItems before getReadableDatabase");
+//            Log.d(TAG, "showItems before getReadableDatabase");
             SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-            Log.d(TAG, "showItems after getReadableDatabase");
+//            Log.d(TAG, "showItems after getReadableDatabase");
             String col[] = {Rule.ID, Rule.RECORD_NAME, Rule.RECORD_ID, Rule.RECORD_TYPE, Rule.RECORD_VALUE, Rule.RECORD_POSITION, Rule.RECORD_COUNT, Rule.RECORD_TIME};
-            cur = db.query(Rule.TABLE_NAME_RECORD, col, "_id like ?", arg, null, null, null);
+            cur = db.query(Rule.TABLE_NAME_RECORD, col, "_id like ?", arg, null, null, Rule.ID+" desc");
             return cur;
         } catch (SQLException e) {
             Log.d(TAG, e.getMessage());
@@ -146,9 +178,9 @@ public class DiaryDAO {
      */
     public boolean deleteRecordOfRemind(int id) {
         try {
-            Log.d(TAG, "deleteItem before getWritableDatabase");
+//            Log.d(TAG, "deleteItem before getWritableDatabase");
             SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-            Log.d(TAG, "deleteItem before getWritableDatabase");
+//            Log.d(TAG, "deleteItem before getWritableDatabase");
             db.delete(Rule.TABLE_NAME_REMIND, " _id = '" + id + " ' ", null);
             return true;
 
@@ -164,9 +196,9 @@ public class DiaryDAO {
      */
     public boolean deleteRecord(int id) {
         try {
-            Log.d(TAG, "deleteItem before getWritableDatabase");
+//            Log.d(TAG, "deleteItem before getWritableDatabase");
             SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-            Log.d(TAG, "deleteItem before getWritableDatabase");
+//            Log.d(TAG, "deleteItem before getWritableDatabase");
             db.delete(Rule.TABLE_NAME_RECORD, " _id = '" + id + " ' ", null);
             return true;
         } catch (SQLException e) {
@@ -185,9 +217,9 @@ public class DiaryDAO {
         String[] arg = {id};
         Cursor cur = null;
         try {
-            Log.d(TAG, "showItems before getReadableDatabase");
+//            Log.d(TAG, "showItems before getReadableDatabase");
             SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-            Log.d(TAG, "showItems after getReadableDatabase");
+//            Log.d(TAG, "showItems after getReadableDatabase");
             String col[] = {"_id", Rule.REMIND_NAME, Rule.REMIND_STATE, Rule.REMIND_COUNT, Rule.REMIND_TYPE};
             cur = db.query(tableName, col, "_id like ?", arg, null, null, null);
             return cur;
@@ -206,10 +238,10 @@ public class DiaryDAO {
         String[] arg = {id};
         Cursor cur = null;
         try {
-            Log.d(TAG, "showItems before getReadableDatabase");
+//            Log.d(TAG, "showItems before getReadableDatabase");
             SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-            Log.d(TAG, "showItems after getReadableDatabase");
-            String col[] = {"_id", Rule.LOTTERY_ID, Rule.LOTTERY_VALUES, Rule.LOTTERY_TIME};
+//            Log.d(TAG, "showItems after getReadableDatabase");
+            String col[] = {"_id", Rule.LOTTERY_ID, Rule.LOTTERY_VALUES, Rule.LOTTERY_TIME,Rule.LOTTERY_IS_READ};
             cur = db.query(tableName, col, "_id like ?", arg, null, null, Rule.LOTTERY_ID+" desc");
             return cur;
         } catch (SQLException e) {
@@ -257,9 +289,9 @@ public class DiaryDAO {
     public Cursor getRecordSet() {
         Cursor cur = null;
         try {
-            Log.d(TAG, "showItems before getReadableDatabase");
+//            Log.d(TAG, "showItems before getReadableDatabase");
             SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-            Log.d(TAG, "showItems after getReadableDatabase");
+//            Log.d(TAG, "showItems after getReadableDatabase");
             String col[] = {Rule.SET_RECORD_PKTEN_BIGSMALL, Rule.SET_RECORD_PKTEN_EVENODD, Rule.SET_RECORD_SHISHICAI_BIGSMALL, Rule.SET_RECORD_SHISHICAI_EVENODD};
             cur = db.query(Rule.TABLE_NAME_SET_RECORD, col, null, null, null, null, null);
             if (cur.getCount() == 0) {//如果设置里面是空的，那么初始化设置99
@@ -275,7 +307,7 @@ public class DiaryDAO {
 
     public boolean updateRecordSet(String shishicaiBigSmall, String shishicaiEvenOdd, String pkTenBigSmall, String pkTenEvenOdd) {
         try {
-            Log.d(TAG, "Do update before getWritableDatabase");
+//            Log.d(TAG, "Do update before getWritableDatabase");
             SQLiteDatabase db = mOpenHelper.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put(Rule.SET_RECORD_PKTEN_BIGSMALL, pkTenBigSmall);
