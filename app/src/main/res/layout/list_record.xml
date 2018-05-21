@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:padding="10dp">
+
 
     <ImageView
         android:id="@+id/icon"
@@ -15,8 +15,7 @@
         android:id="@+id/id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:text="test"/>
+        android:visibility="invisible"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,8 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/black"
-                android:textSize="20sp"
-                android:text="test"/>
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/continued"
@@ -41,9 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="100dp"
                 android:textColor="@android:color/holo_red_dark"
-                android:textSize="15sp"
-                android:layout_marginTop="5dp"
-                android:text="test"/>
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/no"
@@ -52,9 +48,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="10dp"
                 android:textColor="@android:color/holo_red_dark"
-                android:textSize="20sp"
-                tools:ignore="SmallSp"
-                android:text="test"/>
+                android:textSize="20dp" />
 
 
         </RelativeLayout>
@@ -64,8 +58,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:textSize="18sp"
-            android:text="1 2 3 4 5 6 7 8 "/>
+            android:textSize="18sp" />
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -76,18 +70,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="20dp"
-                android:layout_toLeftOf="@id/time"
-                android:text="test 201819961018"/>
+                android:layout_toLeftOf="@id/time" />
 
             <TextView
                 android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="10dp"
-                android:text="test 122323343434"/>
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp" />
 
         </RelativeLayout>
+
     </LinearLayout>
+
 
 </LinearLayout>

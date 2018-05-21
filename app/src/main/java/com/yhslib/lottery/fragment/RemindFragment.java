@@ -5,7 +5,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
@@ -134,6 +133,7 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
                         dialog.dismiss();
                         break;
                     case R.id.ok_btn:
+                        Toast.makeText(getActivity(), "修改成功", Toast.LENGTH_SHORT).show();
                         if (radioPkten.isChecked()) {
                             name = Rule.PKTEN;
                         } else {
@@ -150,15 +150,10 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
                         } else {
                             type = Rule.REMIND_TYPE_SINGLEPAIR;
                         }
-                        try {
-                            count = Integer.parseInt(editTextCount.getText().toString());
-                            diary.updateRemind(String.valueOf(finalId), name, state, count, type);
-                            init();
-                            dialog.dismiss();
-                            Toast.makeText(getActivity(), "修改成功", Toast.LENGTH_SHORT).show();
-                        }catch (Exception e){
-                            Toast.makeText(getActivity(), "输入的内容不合法", Toast.LENGTH_SHORT).show();
-                        }
+                        count = Integer.parseInt(editTextCount.getText().toString());
+                        diary.updateRemind(String.valueOf(finalId), name, state, count, type);
+                        init();
+                        dialog.dismiss();
                         break;
                 }
             }
@@ -282,4 +277,65 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
         simpleCursorAdapter.swapCursor(null);
     }
 
+
+    /*
+    调用此方法将遍历数据库是否有满足用户设定的情况，有的话就发送提醒。
+     */
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public  void sendeMinder() {
+        Cursor cursorRemind = diary.getRecordsOfRmindById(Rule.TABLE_NAME_REMIND, "%%");
+        int id = 0;
+        if (cursorRemind.moveToFirst()) {
+            do {
+                id++;
+                //遍历Cursor对象
+                String name = cursorRemind.getString(cursorRemind.getColumnIndex(Rule.REMIND_NAME));
+                boolean state = cursorRemind.getInt(cursorRemind.getColumnIndex(Rule.REMIND_STATE)) > 0;
+                int count = cursorRemind.getInt(cursorRemind.getColumnIndex(Rule.REMIND_COUNT));
+                String type = cursorRemind.getString(cursorRemind.getColumnIndex(Rule.REMIND_TYPE));
+                if (state) {//如果该提醒处于开启状态
+                    if (name.equals(Rule.PKTEN)) {
+                        if (Rule.isSuitRuleToAlram(Rule.PKTEN, type, count, diary)) {
+                            //发送提醒
+                            SendNotification(Rule.PKTEN, type, count, id);
+                        }
+                    } else {
+                        if (Rule.isSuitRuleToAlram(Rule.SHISHICAI, type, count, diary)) {
+                            //发送提醒
+                            SendNotification(Rule.PKTEN, type, count, id);
+                        }
+                    }
+                }
+            } while (cursorRemind.moveToNext());
+        }
+        cursorRemind.close();
+    }
+
+
+    /*
+            * @param message
+     */
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void SendNotification(String lottery, String type, int count, int id) {
+        String channelID = "remind";
+        String channelName = "remind";
+        NotificationChannel channel = new NotificationChannel(channelID, channelName, NotificationManager.IMPORTANCE_HIGH);
+        //创建通知时指定channelID
+        int notifyId = id;
+        Intent intent = new Intent(getActivity(), MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        Bundle bundle = new Bundle();
+        intent.putExtras(bundle);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity())
+                .setSmallIcon(R.drawable.ic_notifications_black_24dp)
+                .setContentTitle(count + "连通知")
+                .setContentText("您的" + lottery + "彩票，出现了" + type + count + "连")
+                .setContentIntent(PendingIntent.getActivity(getActivity(), notifyId, intent, PendingIntent.FLAG_ONE_SHOT))
+                /**向通知添加声音、闪灯和振动效果的最简单、最一致的方式是使用当前的用户默认设置，使用defaults属性，可以组合：Notification.DEFAULT_ALL就是3种全部提醒**/
+                .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS);
+        NotificationManager manager = (NotificationManager) getActivity().getSystemService(getActivity().NOTIFICATION_SERVICE);
+        manager.createNotificationChannel(channel);
+        builder.setChannelId(channelID);
+        manager.notify(notifyId, builder.build());
+    }
 }
