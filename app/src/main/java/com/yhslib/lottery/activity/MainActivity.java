@@ -167,6 +167,12 @@ public class MainActivity extends AppCompatActivity {
                                 set_record_dialog();
                             }
                         });
+                        actionBar.getCustomView().findViewById(R.id.screen).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                set_record_screen();
+                            }
+                        });
                     }
                     return true;
                 case R.id.navigation_remind:
@@ -274,7 +280,6 @@ public class MainActivity extends AppCompatActivity {
                         dialog.dismiss();
                         break;
                     case R.id.ok_btn:
-                        Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
                         if (radioPkten.isChecked()){
                             name =PKTEN;
                         }else {
@@ -290,10 +295,15 @@ public class MainActivity extends AppCompatActivity {
                         }else {
                             type=REMIND_TYPE_SINGLEPAIR;
                         }
-                        count = Integer.parseInt(editTextCount.getText().toString());
-                        remindDAo.insertRecordOfRemind(name,state,count,type);
-                        dialog.dismiss();
-                        ((RemindFragment)fragments[3]).init();
+                        try {
+                            count = Integer.parseInt(editTextCount.getText().toString());
+                            remindDAo.insertRecordOfRemind(name,state,count,type);
+                            dialog.dismiss();
+                            ((RemindFragment)fragments[3]).init();
+                            Toast.makeText(MainActivity.this, "添加成功", Toast.LENGTH_SHORT).show();
+                        }catch (Exception e){
+                            Toast.makeText(MainActivity.this, "输入的内容不合法", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                 }
             }
@@ -336,8 +346,24 @@ public class MainActivity extends AppCompatActivity {
                         remindDAo.updateRecordSet(shishicaiBigSmallCount.getText().toString(),shishicaiEvenOddCount.getText().toString(),
                                 pktenBigSmallCount.getText().toString(),pktenEvenOddCount.getText().toString());
                         dialog.dismiss();
+                        Cursor cursor =remindDAo.getRecordsOfLotteryById(Rule.TABLE_NAME_PKTEN,"%%");
+                        Cursor cursor2 =remindDAo.getRecordsOfLotteryById(Rule.TABLE_NAME_SHISHICAI,"%%");
+                        int count=0;
+                        if (cursor.moveToFirst()){
+                            do {
+                                count++;
+                                remindDAo.updateLotteryHistoryIsRead(Rule.PKTEN,cursor.getString(cursor.getColumnIndex(Rule.ID)),0);
+                            }while (cursor.moveToNext()&&count<50);
+                        }
+                        count=0;
+                        if (cursor2.moveToFirst()){
+                            do {
+                                count++;
+                                remindDAo.updateLotteryHistoryIsRead(Rule.SHISHICAI,cursor2.getString(cursor2.getColumnIndex(Rule.ID)),0);
+                            }while (cursor2.moveToNext()&&count<50);
+                        }
                         ((RecordFragment)fragments[2]).init();
-//                        ((RecordFragment)fragments[2]).saveRecord();
+                        Rule.saveRecord(remindDAo,MainActivity.this);
                         break;
                 }
             }
@@ -364,6 +390,44 @@ public class MainActivity extends AppCompatActivity {
         shishicaiEvenOddCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_SHISHICAI_EVENODD)));
         pktenBigSmallCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_BIGSMALL)));
         pktenEvenOddCount.setText(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_EVENODD)));
+    }
+
+    private void set_record_screen() {
+        View.OnClickListener listener = new View.OnClickListener() {
+            @SuppressLint("CutPasteId")
+            @Override
+            public void onClick(View view) {
+                EditText editText ;
+                editText = dialog.findViewById(R.id.edit_screen_count);
+                switch (view.getId()) {
+                    case R.id.cancel_btn:
+                        dialog.dismiss();
+                        break;
+                    case R.id.ok_btn:
+                        dialog.dismiss();
+                        try {
+                            ((RecordFragment)fragments[2]).min= Integer.parseInt(editText.getText().toString());
+                        }catch (Exception e){
+                            Toast.makeText(MainActivity.this, "输入的内容不合法", Toast.LENGTH_SHORT).show();
+                        }
+                        ((RecordFragment)fragments[2]).init();
+                        Rule.saveRecord(remindDAo,MainActivity.this);
+                        break;
+                }
+            }
+        };
+
+        CustomDialog.Builder builder = new CustomDialog.Builder(this);
+        dialog = builder
+                .style(R.style.Dialog)
+                .heightDimenRes(R.dimen.dialog_screen_height)
+                .widthDimenRes(R.dimen.dialog_width)
+                .cancelTouchout(false)
+                .view(R.layout.dialog_record_screen)
+                .addViewOnclick(R.id.cancel_btn, listener)
+                .addViewOnclick(R.id.ok_btn, listener)
+                .build();
+        dialog.show();
     }
 
     public void setBarColor() {

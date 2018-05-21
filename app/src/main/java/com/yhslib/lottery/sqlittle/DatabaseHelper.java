@@ -13,6 +13,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "dbForLottery.db";
     private static final int DATABASE_VERSION = 8;
 
+
     DatabaseHelper(Context context) {
 
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,11 +43,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(sql);
 
         sql= "CREATE TABLE " + Rule.TABLE_NAME_SHISHICAI + " (" + Rule.ID + " INTEGER PRIMARY KEY,"+ Rule.LOTTERY_ID + " TEXT NOT NULL, "
-                + Rule.LOTTERY_VALUES + " TEXT NOT NULL, " + Rule.LOTTERY_TIME + " TEXT NOT NULL " +  ");";
+                + Rule.LOTTERY_VALUES + " TEXT NOT NULL, " + Rule.LOTTERY_TIME + " TEXT NOT NULL, " +  Rule.LOTTERY_IS_READ + " INTEGER NOT NULL " +");";
         db.execSQL(sql);
 
         sql= "CREATE TABLE " + Rule.TABLE_NAME_PKTEN + " (" + Rule.ID + " INTEGER PRIMARY KEY,"+ Rule.LOTTERY_ID + " TEXT NOT NULL, "
-                + Rule.LOTTERY_VALUES + " TEXT NOT NULL, " + Rule.LOTTERY_TIME + " TEXT NOT NULL " +  ");";
+                + Rule.LOTTERY_VALUES + " TEXT NOT NULL, " + Rule.LOTTERY_TIME + " TEXT NOT NULL, " +  Rule.LOTTERY_IS_READ + " INTEGER NOT NULL " + ");";
         db.execSQL(sql);
 
         sql= "CREATE TABLE " + Rule.TABLE_NAME_RECORD + " (" + Rule.ID + " INTEGER PRIMARY KEY,"+ Rule.RECORD_ID + " TEXT NOT NULL, "

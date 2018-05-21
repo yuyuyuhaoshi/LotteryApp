@@ -1,11 +1,13 @@
 package com.yhslib.lottery.fragment;
 
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -191,6 +193,7 @@ public class TrendFragment extends Fragment {
     private void fetchPkTenData() {
         String url = Url.PkTenList;
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(String response) {
                 // Log.d(TAG, response);
@@ -221,6 +224,7 @@ public class TrendFragment extends Fragment {
     private void fetchShiShiCaiData() {
         String url = Url.ShiShiCaiList;
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(String response) {
                 // Log.d(TAG, response);
@@ -308,6 +312,7 @@ public class TrendFragment extends Fragment {
         return resultList;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private Boolean createDataToDB(String response, String tableName) {
 
         DiaryDAO diaryDAO = new DiaryDAO(getActivity());
@@ -319,11 +324,11 @@ public class TrendFragment extends Fragment {
                 String period = dataObject.getString("period");
                 String result = dataObject.getString("result");
                 String time = dataObject.getString("time");
-                diaryDAO.insertLotteryHistory(tableName, period, result, time);
+                diaryDAO.insertLotteryHistory(tableName, period, result, time,0);
             }
-
             //Log.d(TAG, resultList.toString());
-            Rule.saveRecord(diaryDAO);
+            Rule.saveRecord(diaryDAO,getActivity());
+            Rule.sendeMinder(diaryDAO,getActivity());
             return true;
         } catch (JSONException e) {
 

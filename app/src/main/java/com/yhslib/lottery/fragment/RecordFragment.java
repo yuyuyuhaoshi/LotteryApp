@@ -36,6 +36,7 @@ public class RecordFragment extends Fragment {
     private SimpleAdapter adapter;
     private DiaryDAO diaryDAO;
     private boolean isThisFragment=false;
+    public static int min=0;
     public static RecordFragment newInstance() {
         Bundle args = new Bundle();
         RecordFragment fragment = new RecordFragment();
@@ -61,7 +62,7 @@ public class RecordFragment extends Fragment {
         String[] from = {"_id","icon", "title", "type", "position", "result", "id", "time"};
         int[] to = {R.id.id,R.id.icon, R.id.title, R.id.no, R.id.continued, R.id.result, R.id.period, R.id.time};
         diaryDAO = new DiaryDAO(getActivity());
-        adapter = new SimpleAdapter(getActivity(), getData(), R.layout.list_record, from, to);
+        adapter = new SimpleAdapter(getActivity(), getData(min), R.layout.list_record, from, to);
         listViewRecord.setAdapter(adapter);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -100,7 +101,8 @@ public class RecordFragment extends Fragment {
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
                 case 111:
-                    Toast.makeText(getActivity(), "刷新结束", Toast.LENGTH_SHORT).show();
+                    init();
+                    Toast.makeText(getActivity(), "记录刷新结束", Toast.LENGTH_SHORT).show();
                     if (swipeRefreshLayout.isRefreshing()) {
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -119,7 +121,7 @@ public class RecordFragment extends Fragment {
     }
 
     //* @参数,name 彩票名，id跳出期号，type类型，value具体内容，position第几个球，count连走了几期，time跳出时间
-    public ArrayList<Map<String, Object>> getData() {
+    public ArrayList<Map<String, Object>> getData(int min) {
         String[] from = {"_id","icon", "title", "type", "position", "result", "id", "time"};
         //"icon"图标, "title"彩票名字, "type"类型, "position"发生位置, "result"具体内容, "id"跳出id, "time"//跳出时间
         ArrayList<Map<String, Object>> data = new ArrayList<>();
@@ -128,28 +130,55 @@ public class RecordFragment extends Fragment {
         if (cursor.moveToFirst()) {
             do {
                 //遍历Cursor对象
-                String name = cursor.getString(cursor.getColumnIndex(Rule.RECORD_NAME));
-                String id = cursor.getString(cursor.getColumnIndex(Rule.RECORD_ID));
-                String type = cursor.getString(cursor.getColumnIndex(Rule.RECORD_TYPE));
-                String values = cursor.getString(cursor.getColumnIndex(Rule.RECORD_VALUE));
-                String position = cursor.getString(cursor.getColumnIndex(Rule.RECORD_POSITION));
                 String count = cursor.getString(cursor.getColumnIndex(Rule.RECORD_COUNT));
-                String time = cursor.getString(cursor.getColumnIndex(Rule.RECORD_TIME));
-                map = new HashMap<>();
-                map.put("_id", cursor.getInt(cursor.getColumnIndex(Rule.ID)));
-                if (name.equals(Rule.PKTEN)) {
-                    map.put("icon", R.mipmap.pkten);
-                    map.put("title", "北京PK拾");
-                } else {
-                    map.put("icon", R.mipmap.shishicai);
-                    map.put("title", "重庆时时彩");
+                if (Integer.parseInt(count)>=min){
+                    String name = cursor.getString(cursor.getColumnIndex(Rule.RECORD_NAME));
+                    String id = cursor.getString(cursor.getColumnIndex(Rule.RECORD_ID));
+                    String type = cursor.getString(cursor.getColumnIndex(Rule.RECORD_TYPE));
+                    String values = cursor.getString(cursor.getColumnIndex(Rule.RECORD_VALUE));
+                    String position = cursor.getString(cursor.getColumnIndex(Rule.RECORD_POSITION));
+                    String time = cursor.getString(cursor.getColumnIndex(Rule.RECORD_TIME));
+                    String[] value=values.split(" ");
+                    int x = Integer.parseInt(value[0]);
+                    if (type.equals(Rule.REMIND_TYPE_BIGSMALL)){
+                        if (name.equals(Rule.PKTEN)){
+                            if (x>5){
+                                type="小";
+                            }else {
+                                type="大";
+                            }
+                        }else {
+                            if (x>4){
+                                type="小";
+                            }else {
+                                type="大";
+                            }
+                        }
+
+                    }if (type.equals(Rule.REMIND_TYPE_SINGLEPAIR)){
+                        if (x%2!=0){
+                            type="双";
+                        }else {
+                            type="单";
+                        }
+                    }
+
+                    map = new HashMap<>();
+                    map.put("_id", cursor.getInt(cursor.getColumnIndex(Rule.ID)));
+                    if (name.equals(Rule.PKTEN)) {
+                        map.put("icon", R.mipmap.pkten);
+                        map.put("title", "北京PK拾");
+                    } else {
+                        map.put("icon", R.mipmap.shishicai);
+                        map.put("title", "重庆时时彩");
+                    }
+                    map.put("id", "跳出期号："+id);
+                    map.put("type", "连走"+count+"个"+type);
+                    map.put("result", values);
+                    map.put("position", "第"+position+"位");
+                    map.put("time", time);
+                    data.add(map);
                 }
-                map.put("id", "跳出期号："+id);
-                map.put("type", type+" "+count+"连");
-                map.put("result", values);
-                map.put("position", "第"+position+"位");
-                map.put("time", time);
-                data.add(map);
             } while (cursor.moveToNext());
         }
         cursor.close();
