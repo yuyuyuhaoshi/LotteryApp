@@ -293,7 +293,7 @@ public class Rule {
                     } else {
                         if (Rule.isSuitRuleToAlram(Rule.SHISHICAI, type, count, diary)) {
                             //发送提醒
-                            SendNotification(Rule.PKTEN, type, count, id,context);
+                            SendNotification(Rule.SHISHICAI, type, count, id,context);
                         }
                     }
                 }
