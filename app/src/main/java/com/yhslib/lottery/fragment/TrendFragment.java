@@ -1,6 +1,8 @@
 package com.yhslib.lottery.fragment;
 
 
+import android.app.Application;
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -257,7 +259,35 @@ public class TrendFragment extends Fragment {
         String[] from = {"period", "data1", "data2", "data3", "data4", "data5", "data6", "data7", "data8", "data9", "data10"};
         int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5, R.id.data6, R.id.data7, R.id.data8, R.id.data9, R.id.data10};
 
-        adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_pkten, from, to);
+        adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_pkten, from, to){
+            @Override
+            public int getItemViewType(int position) {
+                return (position % 2);
+            }
+
+            @Override
+            public int getViewTypeCount() {
+                return 2;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v;
+                v = super.getView(position, convertView, parent);
+                if (v != null && position % 2 == 0) {
+                    v.setBackgroundResource(R.color.color_trend_bg);
+                }
+                for (int j = 0; j < ((LinearLayout) v).getChildCount(); j++) {
+                    TextView textView = (TextView) ((LinearLayout) v).getChildAt(j);
+                    if (textView.getText().equals("单") || textView.getText().equals("小")) {
+                        textView.setTextColor(getResources().getColor(R.color.color_trend_text1));
+                    } else if (textView.getText().equals("双") || textView.getText().equals("大")) {
+                        textView.setTextColor(getResources().getColor(R.color.color_trend_text2));
+                    }
+                }
+                return v;
+            }
+        };
         listView.setAdapter(adapter);
     }
 
@@ -266,7 +296,35 @@ public class TrendFragment extends Fragment {
         String[] from = {"period", "data1", "data2", "data3", "data4", "data5"};
         int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5};
 
-        adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_shishicai, from, to);
+        adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_shishicai, from, to){
+            @Override
+            public int getItemViewType(int position) {
+                return (position % 2);
+            }
+
+            @Override
+            public int getViewTypeCount() {
+                return 2;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v;
+                v = super.getView(position, convertView, parent);
+                if (v != null && position % 2 == 0) {
+                    v.setBackgroundResource(R.color.color_trend_bg);
+                }
+                for (int j = 0; j < ((LinearLayout) v).getChildCount(); j++) {
+                    TextView textView = (TextView) ((LinearLayout) v).getChildAt(j);
+                    if (textView.getText().equals("单") || textView.getText().equals("小")) {
+                        textView.setTextColor(getResources().getColor(R.color.color_trend_text1));
+                    } else if (textView.getText().equals("双") || textView.getText().equals("大")) {
+                        textView.setTextColor(getResources().getColor(R.color.color_trend_text2));
+                    }
+                }
+                return v;
+            }
+        };
         listView.setAdapter(adapter);
     }
 
@@ -327,8 +385,9 @@ public class TrendFragment extends Fragment {
                 diaryDAO.insertLotteryHistory(tableName, period, result, time,0);
             }
             //Log.d(TAG, resultList.toString());
-            Rule.saveRecord(diaryDAO,getActivity());
-            Rule.sendeMinder(diaryDAO,getActivity());
+            Rule.saveRecord(diaryDAO);
+            Rule.sendeMinder(diaryDAO);
+
             return true;
         } catch (JSONException e) {
 

@@ -13,6 +13,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
+import com.yhslib.lottery.Application.MyApplication;
 import com.yhslib.lottery.R;
 import com.yhslib.lottery.activity.MainActivity;
 import com.yhslib.lottery.fragment.RecordFragment;
@@ -121,15 +122,15 @@ public class Rule {
         return false;
     }
 
-    public static void doSaveRecord(String lotteryName, String type, int count, DiaryDAO diary) {
+    public static void doSaveRecord(String lotteryName, int countEvenOdd,int countBigSmall, DiaryDAO diary) {
         String resultId,resultTime;// 每个元素分别代表id跳出彩票的id,values连续内容,position所在位置,count连续多数,time跳出的时间
         int  resultPosition, resultCount;
-        String[] resultValues;
+        String[] resultValuesEvenOdd,resultValuesBigSmall;
         Cursor cursorLottery;
-        int[][] countLottery;
+        int[][] countLotteryEvenOdd,countLotteryBigSmall;
         int smallMin, smallMax, bigMin, bigMax;
         int lotteryLong = 0;
-        boolean[] isJumpOut;
+        boolean[] isJumpOutEvenOdd,isJumpOutBigSmall;
         if (lotteryName.equals(PKTEN)) {
             lotteryLong = 10;
             smallMin = 1;
@@ -137,7 +138,8 @@ public class Rule {
             bigMin = 6;
             bigMax = 10;
             cursorLottery = diary.getRecordsOfLotteryById(TABLE_NAME_PKTEN, "%%");
-            isJumpOut = new boolean[10];
+            isJumpOutEvenOdd= new boolean[10];
+            isJumpOutBigSmall = new boolean[10];
         } else {
             lotteryLong = 5;
             smallMin = 0;
@@ -145,7 +147,8 @@ public class Rule {
             bigMin = 5;
             bigMax = 9;
             cursorLottery = diary.getRecordsOfLotteryById(TABLE_NAME_SHISHICAI, "%%");
-            isJumpOut = new boolean[5];
+            isJumpOutEvenOdd= new boolean[5];
+            isJumpOutBigSmall = new boolean[5];
         }
         for (int z = 0; z < 50; z++) {
             if (cursorLottery.moveToPosition(z)){
@@ -154,75 +157,78 @@ public class Rule {
                 if (isRead==0){//判断这个数据是不是已经被检索了，已经检索了就不进行检索
                     diary.updateLotteryHistoryIsRead(lotteryName,id,1);//将检索状态设置为1（已经检索）
                     if (lotteryName.equals(PKTEN)) {
-                        countLottery = new int[2][10];//第0位是连续的期数，第1位是标记变量。标记变量为-1时，说明这一位已经断开，不再连续
+                        countLotteryBigSmall = new int[2][10];//第0位是连续的期数，第1位是标记变量。标记变量为-1时，说明这一位已经断开，不再连续
+                        countLotteryEvenOdd = new int[2][10];
                     } else {
-                        countLottery = new int[2][5];//第0位是连续的期数，第1位是标记变量。标记变量为-1时，说明这一位已经断开，不再连续
+                        countLotteryBigSmall = new int[2][5];//第0位是连续的期数，第1位是标记变量。标记变量为-1时，说明这一位已经断开，不再连续
+                        countLotteryEvenOdd = new int[2][5];
                     }
                     String[] firstValues = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_VALUES)).split(" ");
                     resultId = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_ID));
                     resultTime = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_TIME));
-                    resultValues = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_VALUES)).split(" ");
+                    resultValuesEvenOdd = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_VALUES)).split(" ");
+                    resultValuesBigSmall = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_VALUES)).split(" ");
                     if (cursorLottery.moveToNext()) {
                         String[] secondValues = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_VALUES)).split(" ");
-                        for (int i = 0; i < resultValues.length; i++) {
-                            resultValues[i] = resultValues[i] + " " + secondValues[i];
+                        for (int i = 0; i < lotteryLong; i++) {
+                            resultValuesEvenOdd[i] = resultValuesEvenOdd[i] + " " + secondValues[i];
+                            resultValuesBigSmall[i] = resultValuesBigSmall[i] + " " + secondValues[i];
                         }
                         int max = 0;
                         while (cursorLottery.moveToNext() && max < 30) {//最多遍历前面的32个记录，即最多获取31连跳
                             max++;
                             String[] values = cursorLottery.getString(cursorLottery.getColumnIndex(LOTTERY_VALUES)).split(" ");
                             for (int i = 0; i < lotteryLong; i++) {
-                                if (type.equals(REMIND_TYPE_SINGLEPAIR)) {
-                                    if (Integer.valueOf(secondValues[i]) % 2 != Integer.valueOf(firstValues[i]) % 2){
-                                        isJumpOut[i]=true;
-                                    }else {
-                                        isJumpOut[i]=false;
-                                    }
-                                    if (Integer.valueOf(secondValues[i]) % 2 == Integer.valueOf(values[i]) % 2 && countLottery[1][i] != -1) {
-                                        countLottery[0][i]++;//如果和新开奖信息是一样的,切标记变量为0，那么连续期数+1，注意1代表连续2期，以此类推
-                                        resultValues[i] = resultValues[i] + " " + values[i];
-                                    } else {
-                                        countLottery[1][i] = -1;//如果和第一期不一样，将标记变量设为-1，下次不再对这一位数遍历
-                                    }
+                                if (Integer.valueOf(secondValues[i]) % 2 != Integer.valueOf(firstValues[i]) % 2){
+                                    isJumpOutEvenOdd[i]=true;
+                                }else {
+                                    isJumpOutEvenOdd[i]=false;
+                                }
+                                if (Integer.valueOf(secondValues[i]) % 2 == Integer.valueOf(values[i]) % 2 && countLotteryEvenOdd[1][i] != -1) {
+                                    countLotteryEvenOdd[0][i]++;//如果和新开奖信息是一样的,切标记变量为0，那么连续期数+1，注意1代表连续2期，以此类推
+                                    resultValuesEvenOdd[i] = resultValuesEvenOdd[i] + " " + values[i];
                                 } else {
-                                    int x = Integer.valueOf(secondValues[i]);
-                                    if (smallMin <= x && x <= smallMax) {//如果是小
-                                        int valueOffirstValues=Integer.valueOf(firstValues[i]);
-                                        if (smallMin <= valueOffirstValues && valueOffirstValues <= smallMax){
-                                            isJumpOut[i]=false;
-                                        }else {
-                                            isJumpOut[i]=true;
-                                        }
-                                        int y = Integer.valueOf(values[i]);
-                                        if (smallMin <= y && y <= smallMax && countLottery[1][i] != -1) {
-                                            countLottery[0][i]++;//如果和新开奖信息是一样的,切标记变量为0，那么连续期数+1，注意1代表连续2期，以此类推
-                                            resultValues[i] = resultValues[i] + " " + values[i];
-                                        } else {
-                                            countLottery[1][i] = -1;//如果和第一期不一样，将标记变量设为-1，下次不再对这一位数遍历
-                                        }
-                                    } else {//如果是大
-                                        int valueOffirstValues=Integer.valueOf(firstValues[i]);
-                                        if (bigMin <= valueOffirstValues && valueOffirstValues <= bigMax){
-                                            isJumpOut[i]=false;
-                                        }else {
-                                            isJumpOut[i]=true;
-                                        }
-                                        int y = Integer.valueOf(values[i]);
-                                        if (bigMin <= y && y <= bigMax && countLottery[1][i] != -1) {
-                                            countLottery[0][i]++;//如果和新开奖信息是一样的,切标记变量为0，那么连续期数+1，注意1代表连续2期，以此类推
-                                            resultValues[i] = resultValues[i] + " " + values[i];
-                                        } else {
-                                            countLottery[1][i] = -1;//如果和第一期不一样，将标记变量设为-1，下次不再对这一位数遍历
-                                        }
+                                    countLotteryEvenOdd[1][i] = -1;//如果和第一期不一样，将标记变量设为-1，下次不再对这一位数遍历
+                                }
+
+
+                                int x = Integer.valueOf(secondValues[i]);
+                                if (smallMin <= x && x <= smallMax) {//如果是小
+                                    int valueOffirstValues=Integer.valueOf(firstValues[i]);
+                                    if (smallMin <= valueOffirstValues && valueOffirstValues <= smallMax){
+                                        isJumpOutBigSmall[i]=false;
+                                    }else {
+                                        isJumpOutBigSmall[i]=true;
+                                    }
+                                    int y = Integer.valueOf(values[i]);
+                                    if (smallMin <= y && y <= smallMax && countLotteryBigSmall[1][i] != -1) {
+                                        countLotteryBigSmall[0][i]++;//如果和新开奖信息是一样的,切标记变量为0，那么连续期数+1，注意1代表连续2期，以此类推
+                                        resultValuesBigSmall[i] = resultValuesBigSmall[i] + " " + values[i];
+                                    } else {
+                                        countLotteryBigSmall[1][i] = -1;//如果和第一期不一样，将标记变量设为-1，下次不再对这一位数遍历
+                                    }
+                                } else {//如果是大
+                                    int valueOffirstValues=Integer.valueOf(firstValues[i]);
+                                    if (bigMin <= valueOffirstValues && valueOffirstValues <= bigMax){
+                                        isJumpOutBigSmall[i]=false;
+                                    }else {
+                                        isJumpOutBigSmall[i]=true;
+                                    }
+                                    int y = Integer.valueOf(values[i]);
+                                    if (bigMin <= y && y <= bigMax && countLotteryBigSmall[1][i] != -1) {
+                                        countLotteryBigSmall[0][i]++;//如果和新开奖信息是一样的,切标记变量为0，那么连续期数+1，注意1代表连续2期，以此类推
+                                        resultValuesBigSmall[i] = resultValuesBigSmall[i] + " " + values[i];
+                                    } else {
+                                        countLotteryBigSmall[1][i] = -1;//如果和第一期不一样，将标记变量设为-1，下次不再对这一位数遍历
                                     }
                                 }
                             }
                         }
                         for (int i = 0; i < lotteryLong; i++) {
-                            if (count <= countLottery[0][i] + 1 && isJumpOut[i]) {//如果连续的期数超过设定阈值，切已经发生了跳出，就返回这次事件的信息
+                            if (countBigSmall <= countLotteryBigSmall[0][i] + 1 && isJumpOutBigSmall[i]) {//如果连续的期数超过设定阈值，切已经发生了跳出，就返回这次事件的信息
 //                        String name,int id,String type, String values,int position,int count,String time
                                 resultPosition = i + 1;
-                                resultCount = (countLottery[0][i] + 1);
+                                resultCount = (countLotteryBigSmall[0][i] + 1);
                                 Cursor cursor = diary.getRecordById("%%");
                                 boolean isHave = false;
                                 if (cursor.moveToFirst()) {
@@ -231,16 +237,39 @@ public class Rule {
                                         //遍历Cursor对象
                                         String nameHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_NAME));
                                         String idHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_ID));
-                                        String typeHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_TYPE));
                                         String positionHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_POSITION));
-                                        if (lotteryName.equals(nameHave) && idHave.equals(resultId) && typeHave.equals(type) && positionHave.equals(resultPosition + "")) {//防止重复插入相同的数据
+                                        if (lotteryName.equals(nameHave) && idHave.equals(resultId)  && positionHave.equals(resultPosition + "")) {//防止重复插入相同的数据
                                             isHave = true;
                                         }
                                     } while (cursor.moveToNext());
                                 }
                                 cursor.close();
                                 if (!isHave) {
-                                    diary.insertRecord(lotteryName, resultId, type, resultValues[i], resultPosition, resultCount, resultTime);
+                                    diary.insertRecord(lotteryName, resultId,REMIND_TYPE_BIGSMALL , resultValuesBigSmall[i], resultPosition, resultCount, resultTime);
+                                }
+                            }
+
+                            if (countEvenOdd <= countLotteryEvenOdd[0][i] + 1 && isJumpOutEvenOdd[i]) {//如果连续的期数超过设定阈值，切已经发生了跳出，就返回这次事件的信息
+//                        String name,int id,String type, String values,int position,int count,String time
+                                resultPosition = i + 1;
+                                resultCount = (countLotteryEvenOdd[0][i] + 1);
+                                Cursor cursor = diary.getRecordById("%%");
+                                boolean isHave = false;
+                                if (cursor.moveToFirst()) {
+                                    do {
+//                                public boolean insertRecord(String name,int id,String type, String values,int position,int count,String time) {
+                                        //遍历Cursor对象
+                                        String nameHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_NAME));
+                                        String idHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_ID));
+                                        String positionHave = cursor.getString(cursor.getColumnIndex(Rule.RECORD_POSITION));
+                                        if (lotteryName.equals(nameHave) && idHave.equals(resultId) && positionHave.equals(resultPosition + "")) {//防止重复插入相同的数据
+                                            isHave = true;
+                                        }
+                                    } while (cursor.moveToNext());
+                                }
+                                cursor.close();
+                                if (!isHave) {
+                                    diary.insertRecord(lotteryName, resultId, REMIND_TYPE_SINGLEPAIR, resultValuesEvenOdd[i], resultPosition, resultCount, resultTime);
                                 }
                             }
                         }
@@ -251,7 +280,8 @@ public class Rule {
         cursorLottery.close();
     }
 
-    public static void saveRecord(DiaryDAO diaryDAO, Context context){
+    public static void saveRecord(DiaryDAO diaryDAO){
+        Context context = MyApplication.getContext();
         Cursor cursor = diaryDAO.getRecordSet();
         cursor.moveToFirst();
         try {
@@ -259,10 +289,12 @@ public class Rule {
             int shishicaiEvenOddCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_SHISHICAI_EVENODD)));
             int pktenBigSmallCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_BIGSMALL)));
             int pktenEvenOddCount= Integer.parseInt(cursor.getString(cursor.getColumnIndex(Rule.SET_RECORD_PKTEN_EVENODD)));
-            Rule.doSaveRecord(Rule.PKTEN,Rule.REMIND_TYPE_BIGSMALL,pktenBigSmallCount,diaryDAO);
-            Rule.doSaveRecord(Rule.PKTEN,Rule.REMIND_TYPE_SINGLEPAIR,pktenEvenOddCount,diaryDAO);
-            Rule.doSaveRecord(Rule.SHISHICAI,Rule.REMIND_TYPE_BIGSMALL,shishicaiBigSmallCount,diaryDAO);
-            Rule.doSaveRecord(Rule.SHISHICAI,Rule.REMIND_TYPE_SINGLEPAIR,shishicaiEvenOddCount,diaryDAO);
+            Rule.doSaveRecord(Rule.PKTEN,pktenEvenOddCount,pktenBigSmallCount,diaryDAO);// 操作数据库由于读取一次之后会被置为已读，所以必须一次完成奇偶和 单双的遍历
+            Rule.doSaveRecord(Rule.SHISHICAI,shishicaiEvenOddCount,shishicaiBigSmallCount,diaryDAO);
+//            Rule.doSaveRecord(Rule.PKTEN,Rule.REMIND_TYPE_BIGSMALL,pktenBigSmallCount,diaryDAO);
+//            Rule.doSaveRecord(Rule.PKTEN,Rule.REMIND_TYPE_SINGLEPAIR,pktenEvenOddCount,diaryDAO);
+//            Rule.doSaveRecord(Rule.SHISHICAI,Rule.REMIND_TYPE_BIGSMALL,shishicaiBigSmallCount,diaryDAO);
+//            Rule.doSaveRecord(Rule.SHISHICAI,Rule.REMIND_TYPE_SINGLEPAIR,shishicaiEvenOddCount,diaryDAO);
         }catch (Exception e){
             Toast.makeText(context, "输入的内容不合法,已经将所有设置重置为99", Toast.LENGTH_SHORT).show();
             diaryDAO.updateRecordSet("99","99","99","99");
@@ -273,7 +305,8 @@ public class Rule {
     调用此方法将遍历数据库是否有满足用户设定的情况，有的话就发送提醒。
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static void sendeMinder(DiaryDAO diary,Context context) {
+    public static void sendeMinder(DiaryDAO diary) {
+        Context context = MyApplication.getContext();
         Cursor cursorRemind = diary.getRecordsOfRmindById(Rule.TABLE_NAME_REMIND, "%%");
         int id = 0;
         if (cursorRemind.moveToFirst()) {
@@ -329,4 +362,51 @@ public class Rule {
         builder.setChannelId(channelID);
         manager.notify(notifyId, builder.build());
     }
+
+//    for (int i = 0; i < lotteryLong; i++) {
+//        if (type.equals(REMIND_TYPE_SINGLEPAIR)) {
+//            if (Integer.valueOf(secondValues[i]) % 2 != Integer.valueOf(firstValues[i]) % 2){
+//                isJumpOut[i]=true;
+//            }else {
+//                isJumpOut[i]=false;
+//            }
+//            if (Integer.valueOf(secondValues[i]) % 2 == Integer.valueOf(values[i]) % 2 && countLottery[1][i] != -1) {
+//                countLottery[0][i]++;//如果和新开奖信息是一样的,切标记变量为0，那么连续期数+1，注意1代表连续2期，以此类推
+//                resultValues[i] = resultValues[i] + " " + values[i];
+//            } else {
+//                countLottery[1][i] = -1;//如果和第一期不一样，将标记变量设为-1，下次不再对这一位数遍历
+//            }
+//        } else {
+//            int x = Integer.valueOf(secondValues[i]);
+//            if (smallMin <= x && x <= smallMax) {//如果是小
+//                int valueOffirstValues=Integer.valueOf(firstValues[i]);
+//                if (smallMin <= valueOffirstValues && valueOffirstValues <= smallMax){
+//                    isJumpOut[i]=false;
+//                }else {
+//                    isJumpOut[i]=true;
+//                }
+//                int y = Integer.valueOf(values[i]);
+//                if (smallMin <= y && y <= smallMax && countLottery[1][i] != -1) {
+//                    countLottery[0][i]++;//如果和新开奖信息是一样的,切标记变量为0，那么连续期数+1，注意1代表连续2期，以此类推
+//                    resultValues[i] = resultValues[i] + " " + values[i];
+//                } else {
+//                    countLottery[1][i] = -1;//如果和第一期不一样，将标记变量设为-1，下次不再对这一位数遍历
+//                }
+//            } else {//如果是大
+//                int valueOffirstValues=Integer.valueOf(firstValues[i]);
+//                if (bigMin <= valueOffirstValues && valueOffirstValues <= bigMax){
+//                    isJumpOut[i]=false;
+//                }else {
+//                    isJumpOut[i]=true;
+//                }
+//                int y = Integer.valueOf(values[i]);
+//                if (bigMin <= y && y <= bigMax && countLottery[1][i] != -1) {
+//                    countLottery[0][i]++;//如果和新开奖信息是一样的,切标记变量为0，那么连续期数+1，注意1代表连续2期，以此类推
+//                    resultValues[i] = resultValues[i] + " " + values[i];
+//                } else {
+//                    countLottery[1][i] = -1;//如果和第一期不一样，将标记变量设为-1，下次不再对这一位数遍历
+//                }
+//            }
+//        }
+//    }
 }

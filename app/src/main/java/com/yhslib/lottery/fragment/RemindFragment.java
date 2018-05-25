@@ -89,7 +89,15 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                int id1 = Integer.parseInt((((TextView) listView.getChildAt(position).findViewById(R.id.id)).getText().toString()));
+                int fetch = 0;
+                if (listView.getLastVisiblePosition() >= listView.getChildCount())//get到的child只能是屏幕显示的，如第100个child，在屏幕里面当前是第2个，那么应当是第二个child而非100
+                {
+                    fetch = listView.getChildCount() - 1 - (listView.getLastVisiblePosition() - position);
+                } else {
+                    fetch = position;
+                }
+                TextView textView = listView.getChildAt(fetch).findViewById(R.id.id);
+                int id1 = Integer.parseInt(textView.getText().toString());
                 remind_dialog(id1);
 //                diary.insertLotteryHistory(Rule.TABLE_NAME_PKTEN,100,"10 9 8 7 6 5 4 3 2 1","2016/10/18");
 //                for (int i = 1; i < 100; i++) {
@@ -156,7 +164,7 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
                             init();
                             dialog.dismiss();
                             Toast.makeText(getActivity(), "修改成功", Toast.LENGTH_SHORT).show();
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             Toast.makeText(getActivity(), "输入的内容不合法", Toast.LENGTH_SHORT).show();
                         }
                         break;
@@ -214,7 +222,16 @@ public class RemindFragment extends Fragment implements LoaderManager.LoaderCall
         if (isThisFragment) {//判断当前fragment是否可见，防止错乱
             isThisFragment = false;
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            int id = Integer.parseInt((((TextView) listView.getChildAt((int) info.id).findViewById(R.id.id)).getText().toString()));
+            int position = (int) info.id;
+            int fetch = 0;
+            if (listView.getLastVisiblePosition() >= listView.getChildCount())//get到的child只能是屏幕显示的，如第100个child，在屏幕里面当前是第2个，那么应当是第二个child而非100
+            {
+                fetch = listView.getChildCount() - 1 - (listView.getLastVisiblePosition() - position);
+            } else {
+                fetch = position;
+            }
+            TextView textView = listView.getChildAt(fetch).findViewById(R.id.id);
+            int id = Integer.parseInt(textView.getText().toString());
             switch (item.getItemId()) {
                 case R.id.delete:
                     Toast.makeText(getActivity(), "删除成功", Toast.LENGTH_SHORT).show();

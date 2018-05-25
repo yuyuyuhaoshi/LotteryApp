@@ -363,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
                             }while (cursor2.moveToNext()&&count<50);
                         }
                         ((RecordFragment)fragments[2]).init();
-                        Rule.saveRecord(remindDAo,MainActivity.this);
+                        Rule.saveRecord(remindDAo);
                         break;
                 }
             }
@@ -411,7 +411,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "输入的内容不合法", Toast.LENGTH_SHORT).show();
                         }
                         ((RecordFragment)fragments[2]).init();
-                        Rule.saveRecord(remindDAo,MainActivity.this);
+                        Rule.saveRecord(remindDAo);
                         break;
                 }
             }

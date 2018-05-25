@@ -28,15 +28,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
 public class RecordFragment extends Fragment {
     private View view;
     private ListView listViewRecord;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SimpleAdapter adapter;
     private DiaryDAO diaryDAO;
-    private boolean isThisFragment=false;
-    public static int min=0;
+    private boolean isThisFragment = false;
+    public static int min = 0;
+
     public static RecordFragment newInstance() {
         Bundle args = new Bundle();
         RecordFragment fragment = new RecordFragment();
@@ -59,8 +59,8 @@ public class RecordFragment extends Fragment {
     }
 
     public void init() {
-        String[] from = {"_id","icon", "title", "type", "position", "result", "id", "time"};
-        int[] to = {R.id.id,R.id.icon, R.id.title, R.id.no, R.id.continued, R.id.result, R.id.period, R.id.time};
+        String[] from = {"_id", "icon", "title", "type", "position", "result", "id", "time"};
+        int[] to = {R.id.id_record, R.id.icon, R.id.title, R.id.no, R.id.continued, R.id.result, R.id.period, R.id.time};
         diaryDAO = new DiaryDAO(getActivity());
         adapter = new SimpleAdapter(getActivity(), getData(min), R.layout.list_record, from, to);
         listViewRecord.setAdapter(adapter);
@@ -73,7 +73,7 @@ public class RecordFragment extends Fragment {
         listViewRecord.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-                isThisFragment=true;
+                isThisFragment = true;
                 MenuInflater menuInflater = getActivity().getMenuInflater();
                 menuInflater.inflate(R.menu.menu_list, menu);
             }
@@ -82,10 +82,19 @@ public class RecordFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (isThisFragment){//判断当前fragment是否可见，防止错乱
-            isThisFragment=false;
+        if (isThisFragment) {//判断当前fragment是否可见，防止错乱
+            isThisFragment = false;
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            int id = Integer.parseInt((((TextView) listViewRecord.getChildAt((int) info.id).findViewById(R.id.id)).getText().toString()));
+            int position = (int) info.id;
+            int fetch = 0;
+            if (listViewRecord.getLastVisiblePosition() >= listViewRecord.getChildCount())//get到的child只能是屏幕显示的，如第100个child，在屏幕里面当前是第2个，那么应当是第二个child而非100
+            {
+                fetch = listViewRecord.getChildCount() - 1 - (listViewRecord.getLastVisiblePosition() - position);
+            } else {
+                fetch = position;
+            }
+            TextView textView = listViewRecord.getChildAt(fetch).findViewById(R.id.id_record);
+            int id = Integer.parseInt(textView.getText().toString());
             switch (item.getItemId()) {
                 case R.id.delete:
                     Toast.makeText(getActivity(), "删除成功", Toast.LENGTH_SHORT).show();
@@ -122,7 +131,7 @@ public class RecordFragment extends Fragment {
 
     //* @参数,name 彩票名，id跳出期号，type类型，value具体内容，position第几个球，count连走了几期，time跳出时间
     public ArrayList<Map<String, Object>> getData(int min) {
-        String[] from = {"_id","icon", "title", "type", "position", "result", "id", "time"};
+        String[] from = {"_id", "icon", "title", "type", "position", "result", "id", "time"};
         //"icon"图标, "title"彩票名字, "type"类型, "position"发生位置, "result"具体内容, "id"跳出id, "time"//跳出时间
         ArrayList<Map<String, Object>> data = new ArrayList<>();
         Map<String, Object> map = new HashMap<>(); //这个new HashMap<>()不可以省略，否则会报空指针
@@ -131,40 +140,41 @@ public class RecordFragment extends Fragment {
             do {
                 //遍历Cursor对象
                 String count = cursor.getString(cursor.getColumnIndex(Rule.RECORD_COUNT));
-                if (Integer.parseInt(count)>=min){
+                if (Integer.parseInt(count) >= min) {
                     String name = cursor.getString(cursor.getColumnIndex(Rule.RECORD_NAME));
                     String id = cursor.getString(cursor.getColumnIndex(Rule.RECORD_ID));
                     String type = cursor.getString(cursor.getColumnIndex(Rule.RECORD_TYPE));
                     String values = cursor.getString(cursor.getColumnIndex(Rule.RECORD_VALUE));
                     String position = cursor.getString(cursor.getColumnIndex(Rule.RECORD_POSITION));
                     String time = cursor.getString(cursor.getColumnIndex(Rule.RECORD_TIME));
-                    String[] value=values.split(" ");
+                    String[] value = values.split(" ");
                     int x = Integer.parseInt(value[0]);
-                    if (type.equals(Rule.REMIND_TYPE_BIGSMALL)){
-                        if (name.equals(Rule.PKTEN)){
-                            if (x>5){
-                                type="小";
-                            }else {
-                                type="大";
+                    if (type.equals(Rule.REMIND_TYPE_BIGSMALL)) {
+                        if (name.equals(Rule.PKTEN)) {
+                            if (x > 5) {
+                                type = "小";
+                            } else {
+                                type = "大";
                             }
-                        }else {
-                            if (x>4){
-                                type="小";
-                            }else {
-                                type="大";
+                        } else {
+                            if (x > 4) {
+                                type = "小";
+                            } else {
+                                type = "大";
                             }
                         }
 
-                    }if (type.equals(Rule.REMIND_TYPE_SINGLEPAIR)){
-                        if (x%2!=0){
-                            type="双";
-                        }else {
-                            type="单";
+                    }
+                    if (type.equals(Rule.REMIND_TYPE_SINGLEPAIR)) {
+                        if (x % 2 != 0) {
+                            type = "双";
+                        } else {
+                            type = "单";
                         }
                     }
 
                     map = new HashMap<>();
-                    map.put("_id", cursor.getInt(cursor.getColumnIndex(Rule.ID)));
+                    map.put("_id", cursor.getString(cursor.getColumnIndex(Rule.ID)));
                     if (name.equals(Rule.PKTEN)) {
                         map.put("icon", R.mipmap.pkten);
                         map.put("title", "北京PK拾");
@@ -172,10 +182,10 @@ public class RecordFragment extends Fragment {
                         map.put("icon", R.mipmap.shishicai);
                         map.put("title", "重庆时时彩");
                     }
-                    map.put("id", "跳出期号："+id);
-                    map.put("type", "连走"+count+"个"+type);
+                    map.put("id", "跳出期号：" + id);
+                    map.put("type", "连走" + count + "个" + type);
                     map.put("result", values);
-                    map.put("position", "第"+position+"位");
+                    map.put("position", "第" + position + "位");
                     map.put("time", time);
                     data.add(map);
                 }
