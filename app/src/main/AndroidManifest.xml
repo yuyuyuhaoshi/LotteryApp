@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.yhslib.lottery">
 
     <application
@@ -21,14 +22,12 @@
             </intent-filter>
         </activity>
 
-        <!--闹钟接收广播-->
-        <receiver
-            android:name="com.yhslib.lottery.service.AlramService"
-            android:exported="false">
+        <receiver android:name="com.yhslib.lottery.service.BroadcastService" >
             <intent-filter>
-                <action android:name="NOTIFICATION" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 </manifest>

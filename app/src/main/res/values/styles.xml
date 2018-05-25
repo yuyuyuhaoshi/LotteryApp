@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -10,9 +10,9 @@
     </style>
 
     <!-- 自定义的ActionBar Style-->
-    <style name="CustomActionBarStyle" parent="@android:style/Widget.DeviceDefault.Light.ActionBar">
-        <item name="android:contentInsetEnd">0dp</item><!--右边距为0-->
-        <item name="android:contentInsetStart">0dp</item><!--左边距为0-->
+    <style name="CustomActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="contentInsetStart">0dp</item><!-- 设置该属性解决空白部分-->
+        <item name="contentInsetEnd">0dp</item>
     </style>
 
     <!-- 自定义的Theme-->
