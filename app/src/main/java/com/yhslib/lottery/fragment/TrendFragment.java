@@ -47,7 +47,8 @@ import java.util.HashMap;
 
 public class TrendFragment extends Fragment {
     private String TAG = "TrendFragment";
-    private String data;
+    private String PkTenData;
+    private String ShiShiCaiData;
     private final int REFRESH_DATA_MESSAGE = 546;
     private final int REFRESH_DATA_DELAY = 30000;
     private final int TABLE_ITEM_COUNT = 0;
@@ -113,29 +114,26 @@ public class TrendFragment extends Fragment {
                 switch (tab.getPosition()) {
                     case 0:
                         selectTableItem = TABLE_ITEM_COUNT;
-                        // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
                         if (trend_lottery_type == LOTTERY_BEIJING) {
-                            setPkTenAdapter(data);
+                            setPkTenAdapter(PkTenData);
                         } else {
-                            setShiShiCaiAdapter(data);
+                            setShiShiCaiAdapter(ShiShiCaiData);
                         }
                         break;
                     case 1:
                         selectTableItem = TABLE_ITEM_SIZE;
-                        // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
                         if (trend_lottery_type == LOTTERY_BEIJING) {
-                            setPkTenAdapter(data);
+                            setPkTenAdapter(PkTenData);
                         } else {
-                            setShiShiCaiAdapter(data);
+                            setShiShiCaiAdapter(ShiShiCaiData);
                         }
                         break;
                     case 2:
                         selectTableItem = TABLE_ITEM_SINGLE_OR_DOUBLE;
-                        // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
                         if (trend_lottery_type == LOTTERY_BEIJING) {
-                            setPkTenAdapter(data);
+                            setPkTenAdapter(PkTenData);
                         } else {
-                            setShiShiCaiAdapter(data);
+                            setShiShiCaiAdapter(ShiShiCaiData);
                         }
                         break;
                 }
@@ -154,7 +152,6 @@ public class TrendFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // TODO 根据所选北京PK10 还是 重庆时时彩刷新数据 if 判断
                 fetchPkTenData();
                 fetchShiShiCaiData();
             }
@@ -199,11 +196,11 @@ public class TrendFragment extends Fragment {
             @Override
             public void onResponse(String response) {
                 // Log.d(TAG, response);
-                data = response;
-                createDataToDB(data, Rule.TABLE_NAME_PKTEN);
+                PkTenData = response;
+                createDataToDB(PkTenData, Rule.TABLE_NAME_PKTEN);
                 // Log.d(TAG, parseJsonArray(data).toString());
                 if (trend_lottery_type == LOTTERY_BEIJING) {
-                    setPkTenAdapter(data);
+                    setPkTenAdapter(PkTenData);
                 }
                 // Toast.makeText(getActivity(), "刷新成功", Toast.LENGTH_SHORT).show();
                 if (swipeRefreshLayout.isRefreshing()) {
@@ -230,8 +227,8 @@ public class TrendFragment extends Fragment {
             @Override
             public void onResponse(String response) {
                 // Log.d(TAG, response);
-                data = response;
-                createDataToDB(data, Rule.TABLE_NAME_SHISHICAI);
+                ShiShiCaiData = response;
+                createDataToDB(ShiShiCaiData, Rule.TABLE_NAME_SHISHICAI);
                 if (trend_lottery_type == LOTTERY_CHONGQING) {
                     setShiShiCaiAdapter(response);
                 }
@@ -259,7 +256,7 @@ public class TrendFragment extends Fragment {
         String[] from = {"period", "data1", "data2", "data3", "data4", "data5", "data6", "data7", "data8", "data9", "data10"};
         int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5, R.id.data6, R.id.data7, R.id.data8, R.id.data9, R.id.data10};
 
-        adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_pkten, from, to){
+        adapter = new SimpleAdapter(MyApplication.getContext(), hm, R.layout.list_trend_pkten, from, to){
             @Override
             public int getItemViewType(int position) {
                 return (position % 2);
@@ -296,7 +293,7 @@ public class TrendFragment extends Fragment {
         String[] from = {"period", "data1", "data2", "data3", "data4", "data5"};
         int[] to = {R.id.no, R.id.data1, R.id.data2, R.id.data3, R.id.data4, R.id.data5};
 
-        adapter = new SimpleAdapter(getActivity(), hm, R.layout.list_trend_shishicai, from, to){
+        adapter = new SimpleAdapter(MyApplication.getContext(), hm, R.layout.list_trend_shishicai, from, to){
             @Override
             public int getItemViewType(int position) {
                 return (position % 2);
@@ -352,7 +349,6 @@ public class TrendFragment extends Fragment {
                     if (selectTableItem == 0) {
                         hashMap.put("data" + (j + 1), resultArray[j]);
                     } else if (selectTableItem == 1) {
-                        // TODO 重庆时时彩 数值范围与北京Pk10不同 多加个判断
                         if (trend_lottery_type == LOTTERY_BEIJING) {
                             hashMap.put("data" + (j + 1), Integer.parseInt(resultArray[j]) >= 6 ? '大' : '小');
                         } else {
