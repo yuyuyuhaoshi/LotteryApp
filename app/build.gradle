@@ -6,8 +6,8 @@ android {
         applicationId "com.yhslib.lottery"
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 8
-        versionName "beta 1.6 修复无法存储奇偶历史事件"
+        versionCode 10
+        versionName "beta 1.8 修复bug"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
